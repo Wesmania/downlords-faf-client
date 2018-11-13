@@ -10,19 +10,21 @@
       <param>
         <option name="enabled" value="true" />
         <option name="name" value="faf-client.server.host" />
-        <option name="value" value="faf.micheljung.ch" />
+        <option name="value" value="local.geosearchef.de" />
       </param>
       <param>
         <option name="enabled" value="true" />
         <option name="name" value="faf-client.server.port" />
-        <option name="value" value="18001" />
+        <option name="value" value="8001" />
       </param>
       <param>
         <option name="enabled" value="true" />
         <option name="name" value="faf-client.api.base-url" />
-        <option name="value" value="http://api.faf.micheljung.ch:10080" />
+        <option name="value" value="https://api.faf.micheljung.ch" />
       </param>
     </additionalParameters>
-    <method />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
   </configuration>
 </component>
