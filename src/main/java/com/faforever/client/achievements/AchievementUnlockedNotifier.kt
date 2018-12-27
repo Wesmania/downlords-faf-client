@@ -9,7 +9,6 @@ import com.faforever.client.notification.TransientNotification
 import com.faforever.client.remote.FafService
 import com.faforever.client.remote.UpdatedAchievement
 import com.faforever.client.remote.UpdatedAchievementsMessage
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
@@ -27,15 +26,15 @@ constructor(private val notificationService: NotificationService, private val i1
 
     @PostConstruct
     internal fun postConstruct() {
-        fafService.addOnMessageListener(UpdatedAchievementsMessage::class.java, Consumer<UpdatedAchievementsMessage> { this.onUpdatedAchievementsMessage(it) })
+        fafService.addOnMessageListener(UpdatedAchievementsMessage::class.java, { this.onUpdatedAchievementsMessage(it) })
     }
 
     private fun onUpdatedAchievementsMessage(message: UpdatedAchievementsMessage) {
-        message.updatedAchievements!!.stream()
-                .filter(Predicate<UpdatedAchievement> { it.getNewlyUnlocked() })
+        message.updatedAchievements.stream()
+                .filter { it.getNewlyUnlocked() }
                 .forEachOrdered { updatedAchievement ->
                     achievementService.getAchievementDefinition(updatedAchievement.achievementId)
-                            .thenAccept(Consumer<AchievementDefinition> { this.notifyAboutUnlockedAchievement(it) })
+                            .thenAccept { this.notifyAboutUnlockedAchievement(it) }
                             .exceptionally { throwable ->
                                 logger.warn("Could not valueOf achievement definition for achievement: {}", updatedAchievement.achievementId, throwable)
                                 null

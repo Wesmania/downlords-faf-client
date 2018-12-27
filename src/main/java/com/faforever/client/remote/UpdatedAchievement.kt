@@ -2,10 +2,9 @@ package com.faforever.client.remote
 
 import com.faforever.client.api.dto.AchievementState
 
-class UpdatedAchievement {
-
-    var achievementId: String? = null
-    var currentState: AchievementState? = null
-    var currentSteps: Int? = null
-    var newlyUnlocked: Boolean = false
-}
+class UpdatedAchievement (
+        val achievementId: String,
+        val currentState: AchievementState,
+        val currentSteps: Int,
+        val newlyUnlocked: Boolean
+)
