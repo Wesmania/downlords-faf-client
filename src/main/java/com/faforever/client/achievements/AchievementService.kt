@@ -19,7 +19,6 @@ import javax.annotation.PostConstruct
 import javax.inject.Inject
 import java.net.URL
 import java.nio.file.Paths
-import java.util.Objects
 import java.util.concurrent.CompletableFuture
 
 import com.github.nocatch.NoCatch.noCatch
@@ -29,29 +28,20 @@ import com.github.nocatch.NoCatch.noCatch
 @Service
 class AchievementService @Inject
 constructor(private val fafService: FafService, private val playerService: PlayerService, private val assetService: AssetService) {
-    private val readOnlyPlayerAchievements: ObservableList<PlayerAchievement>
     @VisibleForTesting
-    internal val playerAchievements: ObservableList<PlayerAchievement>
-
-
+    internal val playerAchievements: ObservableList<PlayerAchievement> = FXCollections.observableArrayList()
+    private val readOnlyPlayerAchievements: ObservableList<PlayerAchievement> = FXCollections.unmodifiableObservableList(playerAchievements)
     val achievementDefinitions: CompletableFuture<List<AchievementDefinition>>
         get() = fafService.achievementDefinitions
 
-    init {
-
-        playerAchievements = FXCollections.observableArrayList()
-        readOnlyPlayerAchievements = FXCollections.unmodifiableObservableList(playerAchievements)
-    }// TODO cut dependencies if possible
-
-
-    fun getPlayerAchievements(playerId: Int?): CompletableFuture<List<PlayerAchievement>> {
+    fun getPlayerAchievements(playerId: Int): CompletableFuture<List<PlayerAchievement>> {
         val currentPlayerId = playerService.currentPlayer.orElseThrow { IllegalStateException("Player has to be set") }.id
         return if (currentPlayerId == playerId) {
             if (readOnlyPlayerAchievements.isEmpty()) {
 
                 reloadAchievements()
-            } else CompletableFuture.completedFuture(readOnlyPlayerAchievements)
-        } else fafService.getPlayerAchievements(playerId!!)
+            } else CompletableFuture.completedFuture(readOnlyPlayerAchievements as List<PlayerAchievement>) /* FIXME - why do we need the typecast? */
+        } else fafService.getPlayerAchievements(playerId)
 
     }
 
