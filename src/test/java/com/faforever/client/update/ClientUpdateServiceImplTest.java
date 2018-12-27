@@ -56,7 +56,7 @@ public class ClientUpdateServiceImplTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testCheckForUpdateInBackgroundUpdateAvailable() throws Exception {
-    instance.currentVersion = new ComparableVersion("v0.4.8.0-alpha");
+    instance.setCurrentVersion(new ComparableVersion("v0.4.8.0-alpha"));
 
     CheckForUpdateTask taskMock = mock(CheckForUpdateTask.class);
 

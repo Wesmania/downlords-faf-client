@@ -102,7 +102,7 @@ public class ModVaultControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.modVaultRoot));
+    assertThat(instance.getRoot(), is(instance.getModVaultRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
@@ -124,8 +124,8 @@ public class ModVaultControllerTest extends AbstractPlainJavaFxTest {
     when(modService.getHighestRatedMods(anyInt(), anyInt())).thenReturn(CompletableFuture.completedFuture(modVersions));
 
     CountDownLatch latch = new CountDownLatch(2);
-    waitUntilInitialized(instance.newestPane, latch);
-    waitUntilInitialized(instance.highestRatedPane, latch);
+    waitUntilInitialized(instance.getNewestPane(), latch);
+    waitUntilInitialized(instance.getHighestRatedPane(), latch);
 
     instance.display(new OpenModVaultEvent());
 
@@ -157,8 +157,8 @@ public class ModVaultControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.waitForFxEvents();
 
     verify(modService).getHighestRatedMods(100, 1);
-    assertThat(instance.showroomGroup.isVisible(), is(false));
-    assertThat(instance.searchResultGroup.isVisible(), is(true));
+    assertThat(instance.getShowroomGroup().isVisible(), is(false));
+    assertThat(instance.getSearchResultGroup().isVisible(), is(true));
   }
 
   @Test
@@ -169,8 +169,8 @@ public class ModVaultControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.waitForFxEvents();
 
     verify(modService).getNewestMods(100, 1);
-    assertFalse(instance.showroomGroup.isVisible());
-    assertTrue(instance.searchResultGroup.isVisible());
+    assertFalse(instance.getShowroomGroup().isVisible());
+    assertTrue(instance.getSearchResultGroup().isVisible());
   }
 
   @Test
@@ -179,7 +179,7 @@ public class ModVaultControllerTest extends AbstractPlainJavaFxTest {
 
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertFalse(instance.showroomGroup.isVisible());
-    assertTrue(instance.searchResultGroup.isVisible());
+    assertFalse(instance.getShowroomGroup().isVisible());
+    assertTrue(instance.getSearchResultGroup().isVisible());
   }
 }

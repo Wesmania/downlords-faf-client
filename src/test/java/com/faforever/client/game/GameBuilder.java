@@ -19,7 +19,7 @@ public class GameBuilder {
   }
 
   public GameBuilder defaultValues() {
-    game.setFeaturedMod(KnownFeaturedMod.DEFAULT.getTechnicalName());
+    game.setFeaturedMod(KnownFeaturedMod.Companion.getDEFAULT().getTechnicalName());
     game.setFeaturedModVersions(FXCollections.emptyObservableMap());
     game.setVictoryCondition(VictoryCondition.DEMORALIZATION);
     game.setHost("Host");

@@ -120,7 +120,7 @@ public class ChannelTabControllerTest extends AbstractPlainJavaFxTest {
     when(userFilterController.getRoot()).thenReturn(new Pane());
     when(userFilterController.filterAppliedProperty()).thenReturn(new SimpleBooleanProperty(false));
     when(chatUserItemController.getRoot()).thenReturn(new Pane());
-    when(uiService.getThemeFileUrl(CHAT_CONTAINER)).thenReturn(getClass().getResource("/theme/chat/chat_container.html"));
+    when(uiService.getThemeFileUrl(Companion.getCHAT_CONTAINER())).thenReturn(getClass().getResource("/theme/chat/chat_container.html"));
 
     loadFxml("theme/chat/channel_tab.fxml", clazz -> instance);
 
@@ -158,36 +158,36 @@ public class ChannelTabControllerTest extends AbstractPlainJavaFxTest {
 
     instance.setChannel(defaultChannel);
 
-    assertEquals(instance.getMessageCssClass(playerName), ChannelTabController.CSS_CLASS_MODERATOR);
+    assertEquals(instance.getMessageCssClass(playerName), ChannelTabController.Companion.getCSS_CLASS_MODERATOR());
   }
 
   @Test
   public void onSearchFieldCloseTest() {
     instance.onSearchFieldClose();
-    assertTrue(!instance.searchField.isVisible());
-    assertEquals("", instance.searchField.getText());
+    assertTrue(!instance.getSearchField().isVisible());
+    assertEquals("", instance.getSearchField().getText());
   }
 
   @Test
   public void onKeyReleasedTestEscape() {
     KeyEvent keyEvent = new KeyEvent(null, null, null, null, null, KeyCode.ESCAPE, false, false, false, false);
 
-    assertTrue(!instance.searchField.isVisible());
+    assertTrue(!instance.getSearchField().isVisible());
     instance.onKeyReleased(keyEvent);
-    assertTrue(!instance.searchField.isVisible());
-    assertEquals("", instance.searchField.getText());
+    assertTrue(!instance.getSearchField().isVisible());
+    assertEquals("", instance.getSearchField().getText());
   }
 
   @Test
   public void onKeyReleasedTestCtrlF() {
     KeyEvent keyEvent = new KeyEvent(null, null, null, null, null, KeyCode.F, false, true, false, false);
 
-    assertTrue(!instance.searchField.isVisible());
+    assertTrue(!instance.getSearchField().isVisible());
     instance.onKeyReleased(keyEvent);
-    assertTrue(instance.searchField.isVisible());
-    assertEquals("", instance.searchField.getText());
+    assertTrue(instance.getSearchField().isVisible());
+    assertEquals("", instance.getSearchField().getText());
     instance.onKeyReleased(keyEvent);
-    assertTrue(!instance.searchField.isVisible());
+    assertTrue(!instance.getSearchField().isVisible());
   }
 
   @Test
@@ -212,7 +212,7 @@ public class ChannelTabControllerTest extends AbstractPlainJavaFxTest {
     captor.getValue().onChanged(change);
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.userSearchTextField.getPromptText(), is("1 Players"));
+    assertThat(instance.getUserSearchTextField().getPromptText(), is("1 Players"));
   }
 
   @Test

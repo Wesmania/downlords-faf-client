@@ -49,10 +49,10 @@ public class StatusBarControllerTest extends AbstractPlainJavaFxTest {
   @Test
   public void testOnFaConnectedDoesntThrowUp() throws Exception {
     String disconnectedText = "foobar";
-    instance.fafConnectionButton.setText(disconnectedText);
+    instance.getFafConnectionButton().setText(disconnectedText);
 
     CompletableFuture<String> textFuture = new CompletableFuture<>();
-    instance.fafConnectionButton.textProperty().addListener((observable, oldValue, newValue) -> textFuture.complete(newValue));
+    instance.getFafConnectionButton().textProperty().addListener((observable, oldValue, newValue) -> textFuture.complete(newValue));
 
     connectionStateProperty.set(ConnectionState.CONNECTED);
 
@@ -62,10 +62,10 @@ public class StatusBarControllerTest extends AbstractPlainJavaFxTest {
   @Test
   public void testOnFaConnecting() throws Exception {
     String disconnectedText = "foobar";
-    instance.fafConnectionButton.setText(disconnectedText);
+    instance.getFafConnectionButton().setText(disconnectedText);
 
     CompletableFuture<String> textFuture = new CompletableFuture<>();
-    instance.fafConnectionButton.textProperty().addListener((observable, oldValue, newValue) -> textFuture.complete(newValue));
+    instance.getFafConnectionButton().textProperty().addListener((observable, oldValue, newValue) -> textFuture.complete(newValue));
 
     connectionStateProperty.set(ConnectionState.CONNECTING);
 
@@ -75,10 +75,10 @@ public class StatusBarControllerTest extends AbstractPlainJavaFxTest {
   @Test
   public void testOnFafDisconnected() throws Exception {
     String disconnectedText = "foobar";
-    instance.fafConnectionButton.setText(disconnectedText);
+    instance.getFafConnectionButton().setText(disconnectedText);
 
     CompletableFuture<String> textFuture = new CompletableFuture<>();
-    instance.fafConnectionButton.textProperty().addListener((observable, oldValue, newValue) -> textFuture.complete(newValue));
+    instance.getFafConnectionButton().textProperty().addListener((observable, oldValue, newValue) -> textFuture.complete(newValue));
 
     connectionStateProperty.set(ConnectionState.DISCONNECTED);
 

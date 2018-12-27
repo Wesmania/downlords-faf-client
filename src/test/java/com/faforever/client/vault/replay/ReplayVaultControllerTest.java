@@ -72,7 +72,7 @@ public class ReplayVaultControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.replayVaultRoot));
+    assertThat(instance.getRoot(), is(instance.getReplayVaultRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 

@@ -98,7 +98,7 @@ public class ChatChannelUserItemControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.chatUserItemRoot));
+    assertThat(instance.getRoot(), is(instance.getRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
@@ -112,12 +112,12 @@ public class ChatChannelUserItemControllerTest extends AbstractPlainJavaFxTest {
     instance.setChatUser(ChatChannelUserBuilder.create("junit").defaultValues().setPlayer(player).get());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.clanMenu.getText(), is("[e]"));
-    assertThat(instance.clanMenu.isVisible(), is(true));
+    assertThat(instance.getClanMenu().getText(), is("[e]"));
+    assertThat(instance.getClanMenu().isVisible(), is(true));
     verify(countryFlagService).loadCountryFlag("US");
-    assertThat(instance.countryTooltip, CoreMatchers.notNullValue());
-    assertThat(instance.avatarTooltip, CoreMatchers.notNullValue());
-    assertThat(instance.userTooltip, CoreMatchers.notNullValue());
+    assertThat(instance.getCountryTooltip(), CoreMatchers.notNullValue());
+    assertThat(instance.getAvatarTooltip(), CoreMatchers.notNullValue());
+    assertThat(instance.getUserTooltip(), CoreMatchers.notNullValue());
     verify(clanTooltipControllerMock).setClan(testClan);
   }
 
@@ -139,12 +139,12 @@ public class ChatChannelUserItemControllerTest extends AbstractPlainJavaFxTest {
     instance.setChatUser(chatUser);
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.statusLabel.getText(), is(""));
+    assertThat(instance.getStatusLabel().getText(), is(""));
 
     player.setGame(GameBuilder.create().defaultValues().get());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.statusLabel.getText(), is("Waiting"));
+    assertThat(instance.getStatusLabel().getText(), is("Waiting"));
   }
 
   @Test
@@ -158,12 +158,12 @@ public class ChatChannelUserItemControllerTest extends AbstractPlainJavaFxTest {
     instance.setChatUser(chatUser);
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.statusLabel.getText(), is(""));
+    assertThat(instance.getStatusLabel().getText(), is(""));
 
     player.setGame(GameBuilder.create().defaultValues().host("junit").state(GameStatus.OPEN).get());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.statusLabel.getText(), is("Hosting"));
+    assertThat(instance.getStatusLabel().getText(), is("Hosting"));
   }
 
   @Test
@@ -176,12 +176,12 @@ public class ChatChannelUserItemControllerTest extends AbstractPlainJavaFxTest {
     instance.setChatUser(chatUser);
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.statusLabel.getText(), is(""));
+    assertThat(instance.getStatusLabel().getText(), is(""));
 
     player.setGame(GameBuilder.create().defaultValues().host("junit").state(GameStatus.PLAYING).get());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.statusLabel.getText(), is("Playing"));
+    assertThat(instance.getStatusLabel().getText(), is("Playing"));
   }
 
   @Test
@@ -195,11 +195,11 @@ public class ChatChannelUserItemControllerTest extends AbstractPlainJavaFxTest {
     player.setGame(GameBuilder.create().defaultValues().host("junit").state(GameStatus.PLAYING).get());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.statusLabel.getText(), is("Playing"));
+    assertThat(instance.getStatusLabel().getText(), is("Playing"));
     player.setGame(null);
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.statusLabel.getText(), is(""));
+    assertThat(instance.getStatusLabel().getText(), is(""));
   }
 
   @Test
@@ -224,7 +224,7 @@ public class ChatChannelUserItemControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testOnContextMenuRequested() {
-    WaitForAsyncUtils.asyncFx(() -> getRoot().getChildren().setAll(instance.chatUserItemRoot));
+    WaitForAsyncUtils.asyncFx(() -> getRoot().getChildren().setAll(instance.getRoot()));
 
     ChatChannelUser chatUser = ChatChannelUserBuilder.create("junit").defaultValues().get();
     instance.setChatUser(chatUser);
@@ -246,15 +246,15 @@ public class ChatChannelUserItemControllerTest extends AbstractPlainJavaFxTest {
   @Test
   public void testSetVisible() {
     instance.setVisible(true);
-    assertThat(instance.chatUserItemRoot.isVisible(), is(true));
-    assertThat(instance.chatUserItemRoot.isManaged(), is(true));
+    assertThat(instance.getRoot().isVisible(), is(true));
+    assertThat(instance.getRoot().isManaged(), is(true));
 
     instance.setVisible(false);
-    assertThat(instance.chatUserItemRoot.isVisible(), is(false));
-    assertThat(instance.chatUserItemRoot.isManaged(), is(false));
+    assertThat(instance.getRoot().isVisible(), is(false));
+    assertThat(instance.getRoot().isManaged(), is(false));
 
     instance.setVisible(true);
-    assertThat(instance.chatUserItemRoot.isVisible(), is(true));
-    assertThat(instance.chatUserItemRoot.isManaged(), is(true));
+    assertThat(instance.getRoot().isVisible(), is(true));
+    assertThat(instance.getRoot().isManaged(), is(true));
   }
 }

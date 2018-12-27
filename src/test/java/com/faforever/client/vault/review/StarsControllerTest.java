@@ -29,7 +29,7 @@ public class StarsControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.starsRoot));
+    assertThat(instance.getRoot(), is(instance.getRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 }

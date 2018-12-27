@@ -58,7 +58,7 @@ public class GamesTilesContainerControllerTest extends AbstractPlainJavaFxTest {
 
     instance.createTiledFlowPane(observableList, new ComboBox<>());
 
-    assertThat(instance.tiledFlowPane.getChildren(), empty());
+    assertThat(instance.getTiledFlowPane().getChildren(), empty());
   }
 
   @Test
@@ -69,13 +69,13 @@ public class GamesTilesContainerControllerTest extends AbstractPlainJavaFxTest {
 
     instance.createTiledFlowPane(observableList, new ComboBox<>());
 
-    assertThat(instance.tiledFlowPane.getChildren(), hasSize(1));
+    assertThat(instance.getTiledFlowPane().getChildren(), hasSize(1));
   }
 
   @Test
   public void testCreateTiledFlowPaneWithPostInstantiatedGameInfoBean() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
-    instance.tiledFlowPane.getChildren().addListener((Observable observable) -> latch.countDown());
+    instance.getTiledFlowPane().getChildren().addListener((Observable observable) -> latch.countDown());
 
     doAnswer(invocation -> new Pane()).when(gameTileController).getRoot();
 
@@ -85,13 +85,13 @@ public class GamesTilesContainerControllerTest extends AbstractPlainJavaFxTest {
     observableList.add(new Game());
 
     latch.await();
-    assertThat(instance.tiledFlowPane.getChildren(), hasSize(1));
+    assertThat(instance.getTiledFlowPane().getChildren(), hasSize(1));
   }
 
   @Test
   public void testCreateTiledFlowPaneWithPopulatedListAndPostInstantiatedGameInfoBean() throws Exception {
     CountDownLatch latch = new CountDownLatch(2);
-    ObservableList<Node> children = instance.tiledFlowPane.getChildren();
+    ObservableList<Node> children = instance.getTiledFlowPane().getChildren();
     children.addListener((Observable observable) -> latch.countDown());
 
     doAnswer(invocation -> new Pane()).when(gameTileController).getRoot();
@@ -131,6 +131,6 @@ public class GamesTilesContainerControllerTest extends AbstractPlainJavaFxTest {
     preferences.setGameTileSortingOrder(TilesSortingOrder.PLAYER_ASC);
 
     instance.createTiledFlowPane(observableList, new ComboBox<>());
-    assertEquals(instance.uidToGameCard.get(game2.getId()), instance.tiledFlowPane.getChildren().get(0));
+    assertEquals(instance.getUidToGameCard().get(game2.getId()), instance.getTiledFlowPane().getChildren().get(0));
   }
 }

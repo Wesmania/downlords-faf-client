@@ -99,7 +99,7 @@ public class PrivateChatTabControllerTest extends AbstractPlainJavaFxTest {
 
     when(playerService.getPlayerForUsername(playerName)).thenReturn(Optional.of(player));
     when(userService.getUsername()).thenReturn(playerName);
-    when(uiService.getThemeFileUrl(CHAT_CONTAINER)).then(invocation -> getThemeFileUrl(invocation.getArgument(0)));
+    when(uiService.getThemeFileUrl(Companion.getCHAT_CONTAINER())).then(invocation -> getThemeFileUrl(invocation.getArgument(0)));
 
     TabPane tabPane = new TabPane();
     tabPane.setSkin(new TabPaneSkin(tabPane));
@@ -124,7 +124,7 @@ public class PrivateChatTabControllerTest extends AbstractPlainJavaFxTest {
     });
     WaitForAsyncUtils.waitForFxEvents();
 
-    verify(webViewConfigurer).configureWebView(eq(instance.messagesWebView));
+    verify(webViewConfigurer).configureWebView(eq(instance.getMessagesWebView()));
   }
 
   @Test

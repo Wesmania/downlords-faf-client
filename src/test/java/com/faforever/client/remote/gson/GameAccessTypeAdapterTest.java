@@ -18,7 +18,7 @@ public class GameAccessTypeAdapterTest {
 
   @Before
   public void setUp() throws Exception {
-    instance = GameAccessTypeAdapter.INSTANCE;
+    instance = GameAccessTypeAdapter.Companion.getINSTANCE();
   }
 
   @Test

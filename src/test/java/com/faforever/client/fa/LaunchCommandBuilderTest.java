@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 public class LaunchCommandBuilderTest {
 
   private static LaunchCommandBuilder defaultBuilder() {
-    return LaunchCommandBuilder.create()
+    return LaunchCommandBuilder.Companion.create()
         .executable(Paths.get("test.exe"))
         .executableDecorator("\"%s\"")
         .logFile(Paths.get("preferences.log"))

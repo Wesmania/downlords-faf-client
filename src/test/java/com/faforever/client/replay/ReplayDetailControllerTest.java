@@ -94,8 +94,8 @@ public class ReplayDetailControllerTest extends AbstractPlainJavaFxTest {
       return instance;
     });
 
-    assertThat(instance.moreInformationPane.isVisible(), is(false));
-    assertThat(instance.moreInformationPane.isManaged(), is(false));
+    assertThat(instance.getMoreInformationPane().isVisible(), is(false));
+    assertThat(instance.getMoreInformationPane().isManaged(), is(false));
   }
 
   @Test
@@ -126,13 +126,13 @@ public class ReplayDetailControllerTest extends AbstractPlainJavaFxTest {
     instance.onDownloadMoreInfoClicked();
 
     verify(replayService).enrich(replay, tmpPath);
-    assertThat(instance.optionsTable.isVisible(), is(true));
-    assertThat(instance.chatTable.isVisible(), is(true));
+    assertThat(instance.getOptionsTable().isVisible(), is(true));
+    assertThat(instance.getChatTable().isVisible(), is(true));
   }
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.replayDetailRoot));
+    assertThat(instance.getRoot(), is(instance.getReplayDetailRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 

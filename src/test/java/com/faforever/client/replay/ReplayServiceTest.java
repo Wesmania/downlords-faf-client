@@ -126,28 +126,28 @@ public class ReplayServiceTest {
 
   @Test
   public void testParseSupComVersion() throws Exception {
-    Integer version = ReplayService.parseSupComVersion(REPLAY_FIRST_BYTES);
+    Integer version = ReplayService.Companion.parseSupComVersion(REPLAY_FIRST_BYTES);
 
     assertEquals((Integer) 3599, version);
   }
 
   @Test
   public void testParseMapName() throws Exception {
-    String mapName = ReplayService.parseMapName(REPLAY_FIRST_BYTES);
+    String mapName = ReplayService.Companion.parseMapName(REPLAY_FIRST_BYTES);
 
     assertEquals(TEST_MAP_NAME, mapName);
   }
 
   @Test
   public void testGuessModByFileNameModIsMissing() throws Exception {
-    String mod = ReplayService.guessModByFileName("110621-2128 Saltrock Colony.SCFAReplay");
+    String mod = ReplayService.Companion.guessModByFileName("110621-2128 Saltrock Colony.SCFAReplay");
 
-    assertEquals(KnownFeaturedMod.DEFAULT.getTechnicalName(), mod);
+    assertEquals(KnownFeaturedMod.Companion.getDEFAULT().getTechnicalName(), mod);
   }
 
   @Test
   public void testGuessModByFileNameModIsBlackops() throws Exception {
-    String mod = ReplayService.guessModByFileName("110621-2128 Saltrock Colony.blackops.SCFAReplay");
+    String mod = ReplayService.Companion.guessModByFileName("110621-2128 Saltrock Colony.blackops.SCFAReplay");
 
     assertEquals("blackops", mod);
   }

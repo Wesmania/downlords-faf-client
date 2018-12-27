@@ -138,7 +138,7 @@ public class GameServiceTest extends AbstractPlainJavaFxTest {
     instance = new GameService(clientProperties, fafService, forgedAllianceService, mapService,
         preferencesService, gameUpdater, notificationService, i18n, executor, playerService,
         reportingService, eventBus, iceAdapter, modService, platformService);
-    instance.replayService = replayService;
+    instance.setReplayService(replayService);
 
     Preferences preferences = new Preferences();
     preferences.getForgedAlliance().setPort(GAME_PORT);
@@ -258,7 +258,7 @@ public class GameServiceTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testWaitForProcessTerminationInBackground() throws Exception {
-    instance.gameRunning.set(true);
+    instance.getGameRunning().set(true);
 
     CompletableFuture<Void> disconnectedFuture = new CompletableFuture<>();
 
@@ -471,7 +471,7 @@ public class GameServiceTest extends AbstractPlainJavaFxTest {
   @Test
   public void testRehostIfGameIsNotRunning() throws Exception {
     Game game = GameBuilder.create().defaultValues().get();
-    instance.currentGame.set(game);
+    instance.getCurrentGame().set(game);
 
     when(modService.getFeaturedMod(game.getFeaturedMod())).thenReturn(CompletableFuture.completedFuture(FeaturedModBeanBuilder.create().defaultValues().get()));
     when(gameUpdater.update(any(), any(), any(), any())).thenReturn(completedFuture(null));
@@ -486,10 +486,10 @@ public class GameServiceTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testRehostIfGameIsRunning() throws Exception {
-    instance.gameRunning.set(true);
+    instance.getGameRunning().set(true);
 
     Game game = GameBuilder.create().defaultValues().get();
-    instance.currentGame.set(game);
+    instance.getCurrentGame().set(game);
 
     instance.onRehostRequest(new RehostRequestEvent());
 
@@ -502,7 +502,7 @@ public class GameServiceTest extends AbstractPlainJavaFxTest {
     game.setId(123);
     game.setStatus(PLAYING);
 
-    instance.currentGame.set(game);
+    instance.getCurrentGame().set(game);
 
     verify(notificationService, never()).addNotification(any(PersistentNotification.class));
 
@@ -520,7 +520,7 @@ public class GameServiceTest extends AbstractPlainJavaFxTest {
 
     when(replayService.findById(123)).thenReturn(completedFuture(Optional.empty()));
 
-    instance.currentGame.set(game);
+    instance.getCurrentGame().set(game);
 
     verify(notificationService, never()).addNotification(any(PersistentNotification.class));
 

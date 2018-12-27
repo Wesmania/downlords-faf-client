@@ -87,11 +87,11 @@ public class SettingsControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testOnTimeSelected() {
-    instance.timeComboBox.setValue(TimeInfo.AUTO);
+    instance.getTimeComboBox().setValue(TimeInfo.AUTO);
 
     instance.onTimeFormatSelected();
 
-    assertThat(preferences.getChat().getTimeFormat(), is(instance.timeComboBox.getValue()));
+    assertThat(preferences.getChat().getTimeFormat(), is(instance.getTimeComboBox().getValue()));
   }
 
   @Test

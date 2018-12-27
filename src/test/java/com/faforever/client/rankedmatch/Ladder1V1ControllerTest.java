@@ -105,20 +105,20 @@ public class Ladder1V1ControllerTest extends AbstractPlainJavaFxTest {
 
     instance.initialize();
 
-    assertThat(instance.aeonButton.isSelected(), is(true));
-    assertThat(instance.seraphimButton.isSelected(), is(true));
-    assertThat(instance.uefButton.isSelected(), is(false));
-    assertThat(instance.cybranButton.isSelected(), is(false));
+    assertThat(instance.getAeonButton().isSelected(), is(true));
+    assertThat(instance.getSeraphimButton().isSelected(), is(true));
+    assertThat(instance.getUefButton().isSelected(), is(false));
+    assertThat(instance.getCybranButton().isSelected(), is(false));
   }
 
   @Test
   public void testAllFactionButtonsMapped() throws Exception {
-    assertThat(instance.factionsToButtons.keySet(), containsInAnyOrder(Faction.AEON, Faction.CYBRAN, Faction.UEF, Faction.SERAPHIM));
+    assertThat(instance.getFactionsToButtons().keySet(), containsInAnyOrder(Faction.AEON, Faction.CYBRAN, Faction.UEF, Faction.SERAPHIM));
   }
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.ladder1v1Root));
+    assertThat(instance.getRoot(), is(instance.getLadder1v1Root()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
@@ -127,11 +127,11 @@ public class Ladder1V1ControllerTest extends AbstractPlainJavaFxTest {
     instance.onCancelButtonClicked();
 
     verify(gameService).stopSearchLadder1v1();
-    assertThat(instance.cancelButton.isVisible(), is(false));
-    assertThat(instance.playButton.isVisible(), is(true));
-    assertThat(instance.searchProgressIndicator.isVisible(), is(false));
-    assertThat(instance.searchingForOpponentLabel.isVisible(), is(false));
-    for (ToggleButton button : instance.factionsToButtons.values()) {
+    assertThat(instance.getCancelButton().isVisible(), is(false));
+    assertThat(instance.getPlayButton().isVisible(), is(true));
+    assertThat(instance.getSearchProgressIndicator().isVisible(), is(false));
+    assertThat(instance.getSearchingForOpponentLabel().isVisible(), is(false));
+    for (ToggleButton button : instance.getFactionsToButtons().values()) {
       assertThat(button.isDisable(), is(false));
     }
   }
@@ -140,18 +140,18 @@ public class Ladder1V1ControllerTest extends AbstractPlainJavaFxTest {
   public void testOnPlayButtonClicked() throws Exception {
     when(forgedAlliancePrefs.getPath()).thenReturn(Paths.get("."));
 
-    instance.aeonButton.setSelected(true);
+    instance.getAeonButton().setSelected(true);
     instance.onFactionButtonClicked();
 
     instance.onPlayButtonClicked();
     instance.setSearching(true);
 
     verify(gameService).startSearchLadder1v1(any());
-    assertThat(instance.cancelButton.isVisible(), is(true));
-    assertThat(instance.playButton.isVisible(), is(false));
-    assertThat(instance.searchProgressIndicator.isVisible(), is(true));
-    assertThat(instance.searchingForOpponentLabel.isVisible(), is(true));
-    for (ToggleButton button : instance.factionsToButtons.values()) {
+    assertThat(instance.getCancelButton().isVisible(), is(true));
+    assertThat(instance.getPlayButton().isVisible(), is(false));
+    assertThat(instance.getSearchProgressIndicator().isVisible(), is(true));
+    assertThat(instance.getSearchingForOpponentLabel().isVisible(), is(true));
+    for (ToggleButton button : instance.getFactionsToButtons().values()) {
       assertThat(button.isDisable(), is(true));
     }
   }
@@ -165,18 +165,18 @@ public class Ladder1V1ControllerTest extends AbstractPlainJavaFxTest {
     verify(gameService, never()).startSearchLadder1v1(any());
     verify(eventBus).post(new MissingGamePathEvent(true));
 
-    assertThat(instance.cancelButton.isVisible(), is(false));
-    assertThat(instance.playButton.isVisible(), is(true));
-    assertThat(instance.searchProgressIndicator.isVisible(), is(false));
-    assertThat(instance.searchingForOpponentLabel.isVisible(), is(false));
+    assertThat(instance.getCancelButton().isVisible(), is(false));
+    assertThat(instance.getPlayButton().isVisible(), is(true));
+    assertThat(instance.getSearchProgressIndicator().isVisible(), is(false));
+    assertThat(instance.getSearchingForOpponentLabel().isVisible(), is(false));
   }
 
   @Test
   public void testOnFactionButtonClicked() throws Exception {
-    instance.aeonButton.setSelected(true);
-    instance.uefButton.setSelected(false);
-    instance.cybranButton.setSelected(true);
-    instance.seraphimButton.setSelected(false);
+    instance.getAeonButton().setSelected(true);
+    instance.getUefButton().setSelected(false);
+    instance.getCybranButton().setSelected(true);
+    instance.getSeraphimButton().setSelected(false);
 
     instance.onFactionButtonClicked();
 

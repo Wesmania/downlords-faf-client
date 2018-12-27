@@ -68,7 +68,7 @@ public class AchievementServiceTest {
 
   @Test
   public void testGetPlayerAchievementsForCurrentUser() throws Exception {
-    instance.playerAchievements.add(new PlayerAchievement());
+    instance.getPlayerAchievements().add(new PlayerAchievement());
     instance.getPlayerAchievements(PLAYER_ID);
     verify(fafService).addOnMessageListener(ArgumentMatchers.any(), ArgumentMatchers.any());
     verifyNoMoreInteractions(fafService);

@@ -65,9 +65,9 @@ public class GamesTableControllerTest extends AbstractPlainJavaFxTest {
         GameBuilder.create().defaultValues().state(GameStatus.CLOSED).get()
     ));
 
-    assertThat(instance.gamesTable.getSortOrder(), hasSize(1));
-    assertThat(instance.gamesTable.getSortOrder().get(0).getId(), is("hostColumn"));
-    assertThat(instance.gamesTable.getSortOrder().get(0).getSortType(), is(SortType.DESCENDING));
+    assertThat(instance.getGamesTable().getSortOrder(), hasSize(1));
+    assertThat(instance.getGamesTable().getSortOrder().get(0).getId(), is("hostColumn"));
+    assertThat(instance.getGamesTable().getSortOrder().get(0).getSortType(), is(SortType.DESCENDING));
   }
 
   @Test
@@ -79,9 +79,9 @@ public class GamesTableControllerTest extends AbstractPlainJavaFxTest {
         GameBuilder.create().defaultValues().state(GameStatus.CLOSED).get()
     ));
 
-    TableColumn<Game, ?> column = instance.gamesTable.getColumns().get(0);
+    TableColumn<Game, ?> column = instance.getGamesTable().getColumns().get(0);
     column.setSortType(SortType.ASCENDING);
-    instance.gamesTable.getSortOrder().add(column);
+    instance.getGamesTable().getSortOrder().add(column);
 
     assertThat(preferencesService.getPreferences().getGameListSorting(), hasSize(1));
     assertThat(

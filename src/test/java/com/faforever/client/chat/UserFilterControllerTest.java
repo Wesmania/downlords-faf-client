@@ -33,7 +33,7 @@ public class UserFilterControllerTest extends AbstractPlainJavaFxTest {
   @Before
   public void setUp() throws Exception {
     instance = new UserFilterController(i18n);
-    instance.channelTabController = channelTabController;
+    instance.setChannelTabController(channelTabController);
 
     player = PlayerBuilder.create("junit").defaultValues().get();
     chatChannelUser = ChatChannelUserBuilder.create("junit")
@@ -47,14 +47,14 @@ public class UserFilterControllerTest extends AbstractPlainJavaFxTest {
   @Test
   public void setChannelTabControllerTest() {
     instance.setChannelController(channelTabController);
-    assertEquals(channelTabController, instance.channelTabController);
+    assertEquals(channelTabController, instance.getChannelTabController());
   }
 
   @Test
   public void testIsInClan() {
     String testClan = "testClan";
     player.setClan(testClan);
-    instance.clanFilterField.setText(testClan);
+    instance.getClanFilterField().setText(testClan);
 
     assertTrue(instance.isInClan(chatChannelUser));
   }
@@ -64,8 +64,8 @@ public class UserFilterControllerTest extends AbstractPlainJavaFxTest {
     player.setGlobalRatingMean(500f);
     player.setGlobalRatingDeviation(0f);
 
-    instance.minRatingFilterField.setText("300");
-    instance.maxRatingFilterField.setText("700");
+    instance.getMinRatingFilterField().setText("300");
+    instance.getMaxRatingFilterField().setText("700");
 
     assertTrue(instance.isBoundByRating(chatChannelUser));
   }
@@ -75,8 +75,8 @@ public class UserFilterControllerTest extends AbstractPlainJavaFxTest {
     player.setGlobalRatingMean(500f);
     player.setGlobalRatingDeviation(0f);
 
-    instance.minRatingFilterField.setText("600");
-    instance.maxRatingFilterField.setText("300");
+    instance.getMinRatingFilterField().setText("600");
+    instance.getMaxRatingFilterField().setText("300");
 
     assertFalse(instance.isBoundByRating(chatChannelUser));
   }
@@ -84,7 +84,7 @@ public class UserFilterControllerTest extends AbstractPlainJavaFxTest {
   @Test
   public void testIsGameStatusMatchPlaying() {
     player.setGame(GameBuilder.create().defaultValues().state(GameStatus.PLAYING).get());
-    instance.playerStatusFilter = PLAYING;
+    instance.setPlayerStatusFilter(PLAYING);
 
     assertTrue(instance.isGameStatusMatch(chatChannelUser));
   }
@@ -92,12 +92,12 @@ public class UserFilterControllerTest extends AbstractPlainJavaFxTest {
   @Test
   public void testIsGameStatusMatchLobby() {
     player.setGame(GameBuilder.create().defaultValues().state(GameStatus.OPEN).host(player.getUsername()).get());
-    instance.playerStatusFilter = HOSTING;
+    instance.setPlayerStatusFilter(HOSTING);
 
     assertTrue(instance.isGameStatusMatch(chatChannelUser));
 
     player.setGame(GameBuilder.create().defaultValues().state(GameStatus.OPEN).get());
-    instance.playerStatusFilter = LOBBYING;
+    instance.setPlayerStatusFilter(LOBBYING);
 
     assertTrue(instance.isGameStatusMatch(chatChannelUser));
   }
@@ -107,8 +107,8 @@ public class UserFilterControllerTest extends AbstractPlainJavaFxTest {
     when(i18n.get("game.gameStatus.playing")).thenReturn("playing");
 
     instance.onGameStatusPlaying();
-    assertEquals(PLAYING, instance.playerStatusFilter);
-    assertEquals(i18n.get("game.gameStatus.playing"), instance.gameStatusMenu.getText());
+    assertEquals(PLAYING, instance.getPlayerStatusFilter());
+    assertEquals(i18n.get("game.gameStatus.playing"), instance.getGameStatusMenu().getText());
   }
 
   @Test
@@ -116,8 +116,8 @@ public class UserFilterControllerTest extends AbstractPlainJavaFxTest {
     when(i18n.get("game.gameStatus.lobby")).thenReturn("lobby");
 
     instance.onGameStatusLobby();
-    assertEquals(LOBBYING, instance.playerStatusFilter);
-    assertEquals(i18n.get("game.gameStatus.lobby"), instance.gameStatusMenu.getText());
+    assertEquals(LOBBYING, instance.getPlayerStatusFilter());
+    assertEquals(i18n.get("game.gameStatus.lobby"), instance.getGameStatusMenu().getText());
   }
 
   @Test
@@ -125,7 +125,7 @@ public class UserFilterControllerTest extends AbstractPlainJavaFxTest {
     when(i18n.get("game.gameStatus.none")).thenReturn("none");
 
     instance.onGameStatusNone();
-    assertEquals(IDLE, instance.playerStatusFilter);
-    assertEquals(i18n.get("game.gameStatus.none"), instance.gameStatusMenu.getText());
+    assertEquals(IDLE, instance.getPlayerStatusFilter());
+    assertEquals(i18n.get("game.gameStatus.none"), instance.getGameStatusMenu().getText());
   }
 }

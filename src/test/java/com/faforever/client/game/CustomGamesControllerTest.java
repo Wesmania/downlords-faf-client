@@ -83,17 +83,17 @@ public class CustomGamesControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testSetSelectedGameShowsDetailPane() {
-    assertFalse(instance.gameDetailPane.isVisible());
+    assertFalse(instance.getGameDetailPane().isVisible());
     instance.setSelectedGame(GameBuilder.create().defaultValues().get());
-    assertTrue(instance.gameDetailPane.isVisible());
+    assertTrue(instance.getGameDetailPane().isVisible());
   }
 
   @Test
   public void testSetSelectedGameNullHidesDetailPane() {
     instance.setSelectedGame(GameBuilder.create().defaultValues().get());
-    assertTrue(instance.gameDetailPane.isVisible());
+    assertTrue(instance.getGameDetailPane().isVisible());
     instance.setSelectedGame(null);
-    assertFalse(instance.gameDetailPane.isVisible());
+    assertFalse(instance.getGameDetailPane().isVisible());
   }
 
   @Test
@@ -117,24 +117,24 @@ public class CustomGamesControllerTest extends AbstractPlainJavaFxTest {
     games.addAll(game, gameWithMod, gameWithPW, gameWithModAndPW);
     instance.setFilteredList(games);
 
-    instance.showModdedGamesCheckBox.setSelected(true);
-    instance.showPasswordProtectedGamesCheckBox.setSelected(true);
-    assertEquals(4, instance.filteredItems.size());
+    instance.getShowModdedGamesCheckBox().setSelected(true);
+    instance.getShowPasswordProtectedGamesCheckBox().setSelected(true);
+    assertEquals(4, instance.getFilteredItems().size());
 
-    instance.showModdedGamesCheckBox.setSelected(false);
-    assertEquals(2, instance.filteredItems.size());
+    instance.getShowModdedGamesCheckBox().setSelected(false);
+    assertEquals(2, instance.getFilteredItems().size());
 
-    instance.showPasswordProtectedGamesCheckBox.setSelected(false);
-    assertEquals(1, instance.filteredItems.size());
+    instance.getShowPasswordProtectedGamesCheckBox().setSelected(false);
+    assertEquals(1, instance.getFilteredItems().size());
 
-    instance.showModdedGamesCheckBox.setSelected(true);
-    assertEquals(2, instance.filteredItems.size());
+    instance.getShowModdedGamesCheckBox().setSelected(true);
+    assertEquals(2, instance.getFilteredItems().size());
   }
 
   @Test
   public void testTiles() {
-    instance.tilesButton.fire();
+    instance.getTilesButton().fire();
     WaitForAsyncUtils.waitForFxEvents();
-    verify(gamesTilesContainerController).createTiledFlowPane(games, instance.chooseSortingTypeChoiceBox);
+    verify(gamesTilesContainerController).createTiledFlowPane(games, instance.getChooseSortingTypeChoiceBox());
   }
 }

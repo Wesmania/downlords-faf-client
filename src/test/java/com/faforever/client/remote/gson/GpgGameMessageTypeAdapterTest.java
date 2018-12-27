@@ -18,7 +18,7 @@ public class GpgGameMessageTypeAdapterTest {
 
   @Before
   public void setUp() throws Exception {
-    instance = GpgClientMessageTypeAdapter.INSTANCE;
+    instance = GpgClientMessageTypeAdapter.Companion.getINSTANCE();
   }
 
   @Test

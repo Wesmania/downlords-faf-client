@@ -101,9 +101,9 @@ public class ModDetailControllerTest extends AbstractPlainJavaFxTest {
 
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.nameLabel.getText(), is("ModVersion name"));
-    assertThat(instance.authorLabel.getText(), is("ModVersion author"));
-    assertThat(instance.thumbnailImageView.getImage(), is(notNullValue()));
+    assertThat(instance.getNameLabel().getText(), is("ModVersion name"));
+    assertThat(instance.getAuthorLabel().getText(), is("ModVersion author"));
+    assertThat(instance.getThumbnailImageView().getImage(), is(notNullValue()));
     verify(modService).loadThumbnail(modVersion);
   }
 
@@ -120,7 +120,7 @@ public class ModDetailControllerTest extends AbstractPlainJavaFxTest {
 
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.thumbnailImageView.getImage(), is(image));
+    assertThat(instance.getThumbnailImageView().getImage(), is(image));
   }
 
   @Test
@@ -178,16 +178,16 @@ public class ModDetailControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(() -> getRoot().getChildren().add(instance.getRoot()));
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.modDetailRoot.getParent(), is(notNullValue()));
+    assertThat(instance.getRoot().getParent(), is(notNullValue()));
     WaitForAsyncUtils.asyncFx(() -> instance.onCloseButtonClicked());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.modDetailRoot.isVisible(), is(false));
+    assertThat(instance.getRoot().isVisible(), is(false));
   }
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.modDetailRoot));
+    assertThat(instance.getRoot(), is(instance.getRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
@@ -196,8 +196,8 @@ public class ModDetailControllerTest extends AbstractPlainJavaFxTest {
     when(modService.isModInstalled("1")).thenReturn(true);
     instance.setModVersion(ModInfoBeanBuilder.create().defaultValues().uid("1").get());
 
-    assertThat(instance.installButton.isVisible(), is(false));
-    assertThat(instance.uninstallButton.isVisible(), is(true));
+    assertThat(instance.getInstallButton().isVisible(), is(false));
+    assertThat(instance.getUninstallButton().isVisible(), is(true));
   }
 
   @Test
@@ -205,8 +205,8 @@ public class ModDetailControllerTest extends AbstractPlainJavaFxTest {
     when(modService.isModInstalled("1")).thenReturn(false);
     instance.setModVersion(ModInfoBeanBuilder.create().defaultValues().uid("1").get());
 
-    assertThat(instance.installButton.isVisible(), is(true));
-    assertThat(instance.uninstallButton.isVisible(), is(false));
+    assertThat(instance.getInstallButton().isVisible(), is(true));
+    assertThat(instance.getUninstallButton().isVisible(), is(false));
   }
 
   @Test
@@ -216,13 +216,13 @@ public class ModDetailControllerTest extends AbstractPlainJavaFxTest {
     instance.setModVersion(modVersion);
     installedModVersions.add(modVersion);
 
-    assertThat(instance.installButton.isVisible(), is(false));
-    assertThat(instance.uninstallButton.isVisible(), is(true));
+    assertThat(instance.getInstallButton().isVisible(), is(false));
+    assertThat(instance.getUninstallButton().isVisible(), is(true));
 
     installedModVersions.remove(modVersion);
 
-    assertThat(instance.installButton.isVisible(), is(true));
-    assertThat(instance.uninstallButton.isVisible(), is(false));
+    assertThat(instance.getInstallButton().isVisible(), is(true));
+    assertThat(instance.getUninstallButton().isVisible(), is(false));
   }
 
   @Test
@@ -231,12 +231,12 @@ public class ModDetailControllerTest extends AbstractPlainJavaFxTest {
     ModVersion modVersion = ModInfoBeanBuilder.create().defaultValues().uid("1").get();
     instance.setModVersion(modVersion);
 
-    assertThat(instance.installButton.isVisible(), is(true));
-    assertThat(instance.uninstallButton.isVisible(), is(false));
+    assertThat(instance.getInstallButton().isVisible(), is(true));
+    assertThat(instance.getUninstallButton().isVisible(), is(false));
 
     installedModVersions.add(modVersion);
 
-    assertThat(instance.installButton.isVisible(), is(false));
-    assertThat(instance.uninstallButton.isVisible(), is(true));
+    assertThat(instance.getInstallButton().isVisible(), is(false));
+    assertThat(instance.getUninstallButton().isVisible(), is(true));
   }
 }

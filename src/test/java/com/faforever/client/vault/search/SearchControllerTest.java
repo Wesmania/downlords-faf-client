@@ -51,11 +51,11 @@ public class SearchControllerTest extends AbstractPlainJavaFxTest {
   public void setUp() throws Exception {
     when(uiService.loadFxml("theme/vault/search/logical_node.fxml")).thenAnswer(invocation -> {
       LogicalNodeController controller = mock(LogicalNodeController.class);
-      controller.logicalOperatorField = new ComboBox<>();
-      controller.specificationController = mock(SpecificationController.class);
-      controller.specificationController.propertyField = new ComboBox<>();
-      controller.specificationController.operationField = new ComboBox<>();
-      controller.specificationController.valueField = new ComboBox<>();
+      controller.setLogicalOperatorField(new ComboBox<>());
+      controller.setSpecificationController(mock(SpecificationController.class));
+      controller.getSpecificationController().setPropertyField(new ComboBox<>());
+      controller.getSpecificationController().setOperationField(new ComboBox<>());
+      controller.getSpecificationController().setValueField(new ComboBox<>());
       when(controller.getRoot()).thenReturn(new Pane());
       return controller;
     });
@@ -73,14 +73,14 @@ public class SearchControllerTest extends AbstractPlainJavaFxTest {
       return instance;
     });
 
-    instance.setSearchableProperties(SearchableProperties.GAME_PROPERTIES);
+    instance.setSearchableProperties(SearchableProperties.INSTANCE.getGAME_PROPERTIES());
     instance.setSortConfig(preferencesService.getPreferences().getVaultPrefs().onlineReplaySortConfigProperty());
   }
 
   @Test
   public void testOnSearchButtonClicked() throws Exception {
     instance.setSearchListener(searchListener);
-    instance.queryTextField.setText("query");
+    instance.getQueryTextField().setText("query");
 
     instance.onSearchButtonClicked();
 
@@ -95,19 +95,19 @@ public class SearchControllerTest extends AbstractPlainJavaFxTest {
     when(specificationController.appendTo(any())).thenReturn(Optional.of(condition));
     when(condition.query(any(RSQLVisitor.class))).thenReturn("name==JUnit");
 
-    specificationController.propertyField.setValue("name");
-    specificationController.operationField.getSelectionModel().select(0);
-    specificationController.valueField.setValue("JUnit");
+    specificationController.getPropertyField().setValue("name");
+    specificationController.getOperationField().getSelectionModel().select(0);
+    specificationController.getValueField().setValue("JUnit");
 
-    assertThat(instance.queryTextField.getText(), is("name==JUnit"));
+    assertThat(instance.getQueryTextField().getText(), is("name==JUnit"));
   }
 
   @Test
   public void testSorting() throws Exception {
     instance.setSearchListener(searchListener);
-    instance.queryTextField.setText("query");
-    instance.sortOrderChoiceBox.getSelectionModel().select(SortOrder.ASC);
-    instance.sortPropertyComboBox.getSelectionModel().select("game.title");
+    instance.getQueryTextField().setText("query");
+    instance.getSortOrderChoiceBox().getSelectionModel().select(SortOrder.ASC);
+    instance.getSortPropertyComboBox().getSelectionModel().select("game.title");
 
     instance.onSearchButtonClicked();
 

@@ -31,19 +31,19 @@ public class PersistentNotificationControllerTest extends AbstractPlainJavaFxTes
 
   @Test
   public void testSetNotificationInfoNoAction() throws Exception {
-    assertThat(instance.actionButtonsContainer.getChildren(), empty());
+    assertThat(instance.getActionButtonsContainer().getChildren(), empty());
 
     PersistentNotification notification = new PersistentNotification("foo", Severity.INFO);
     instance.setNotification(notification);
 
-    assertEquals("foo", instance.messageLabel.getText());
-    assertEquals("\uE88F", instance.iconLabel.getText());
-    assertThat(instance.actionButtonsContainer.getChildren(), hasSize(0));
+    assertEquals("foo", instance.getMessageLabel().getText());
+    assertEquals("\uE88F", instance.getIconLabel().getText());
+    assertThat(instance.getActionButtonsContainer().getChildren(), hasSize(0));
   }
 
   @Test
   public void testSetNotificationWarningOneAction() throws Exception {
-    assertThat(instance.actionButtonsContainer.getChildren(), empty());
+    assertThat(instance.getActionButtonsContainer().getChildren(), empty());
 
     PersistentNotification notification = new PersistentNotification("foo", Severity.WARN,
         Collections.singletonList(
@@ -52,26 +52,26 @@ public class PersistentNotificationControllerTest extends AbstractPlainJavaFxTes
     );
     instance.setNotification(notification);
 
-    assertEquals("foo", instance.messageLabel.getText());
-    assertEquals("\uE002", instance.iconLabel.getText());
-    assertThat(instance.actionButtonsContainer.getChildren(), hasSize(1));
+    assertEquals("foo", instance.getMessageLabel().getText());
+    assertEquals("\uE002", instance.getIconLabel().getText());
+    assertThat(instance.getActionButtonsContainer().getChildren(), hasSize(1));
   }
 
   @Test
   public void testSetNotificationErrorNoAction() throws Exception {
-    assertThat(instance.actionButtonsContainer.getChildren(), empty());
+    assertThat(instance.getActionButtonsContainer().getChildren(), empty());
 
     PersistentNotification notification = new PersistentNotification("foo", Severity.ERROR);
     instance.setNotification(notification);
 
-    assertEquals("foo", instance.messageLabel.getText());
-    assertEquals("\uE001", instance.iconLabel.getText());
-    assertThat(instance.actionButtonsContainer.getChildren(), hasSize(0));
+    assertEquals("foo", instance.getMessageLabel().getText());
+    assertEquals("\uE001", instance.getIconLabel().getText());
+    assertThat(instance.getActionButtonsContainer().getChildren(), hasSize(0));
   }
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.notificationRoot));
+    assertThat(instance.getRoot(), is(instance.getRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 

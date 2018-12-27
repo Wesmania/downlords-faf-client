@@ -110,7 +110,7 @@ public class ChatControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.chatRoot));
+    assertThat(instance.getRoot(), is(instance.getRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
@@ -143,7 +143,7 @@ public class ChatControllerTest extends AbstractPlainJavaFxTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testOnJoinChannelButtonClicked() throws Exception {
-    assertThat(instance.tabPane.getTabs(), is(empty()));
+    assertThat(instance.getTabPane().getTabs(), is(empty()));
 
     Tab tab = new Tab();
     tab.setId(TEST_CHANNEL_NAME);
@@ -159,7 +159,7 @@ public class ChatControllerTest extends AbstractPlainJavaFxTest {
       return null;
     }).when(chatService).joinChannel(anyString());
 
-    instance.channelNameTextField.setText(TEST_CHANNEL_NAME);
+    instance.getChannelNameTextField().setText(TEST_CHANNEL_NAME);
     instance.onJoinChannelButtonClicked();
 
     verify(chatService).joinChannel(TEST_CHANNEL_NAME);
@@ -172,11 +172,11 @@ public class ChatControllerTest extends AbstractPlainJavaFxTest {
     onUsersListenerCaptor.getValue().onChanged(change);
 
     CountDownLatch tabAddedLatch = new CountDownLatch(1);
-    instance.tabPane.getTabs().addListener((InvalidationListener) observable -> tabAddedLatch.countDown());
+    instance.getTabPane().getTabs().addListener((InvalidationListener) observable -> tabAddedLatch.countDown());
     tabAddedLatch.await(2, TimeUnit.SECONDS);
 
-    assertThat(instance.tabPane.getTabs(), hasSize(1));
-    assertThat(instance.tabPane.getTabs().get(0).getId(), is(TEST_CHANNEL_NAME));
+    assertThat(instance.getTabPane().getTabs(), hasSize(1));
+    assertThat(instance.getTabPane().getTabs().get(0).getId(), is(TEST_CHANNEL_NAME));
   }
 
   @Test

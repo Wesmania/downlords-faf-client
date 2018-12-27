@@ -60,7 +60,7 @@ public class GameBinariesUpdateTaskTest {
     Path fafBinPath = fafBinDirectory.getRoot().toPath();
     Path faBinPath = faDirectory.getRoot().toPath().resolve("bin");
 
-    for (String fileName : GameBinariesUpdateTaskImpl.BINARIES_TO_COPY) {
+    for (String fileName : GameBinariesUpdateTaskImpl.Companion.getBINARIES_TO_COPY()) {
       createFileWithSize(faBinPath.resolve(fileName), 1024);
     }
     createFileWithSize(faBinPath.resolve("splash.png"), 1024);
@@ -70,8 +70,8 @@ public class GameBinariesUpdateTaskTest {
     List<Path> resultFiles = java.nio.file.Files.list(fafBinPath).collect(Collectors.toList());
 
     // Expected all files except splash.png to be copied
-    assertThat(resultFiles.size(), is(GameBinariesUpdateTaskImpl.BINARIES_TO_COPY.size()));
-    for (String fileName : GameBinariesUpdateTaskImpl.BINARIES_TO_COPY) {
+    assertThat(resultFiles.size(), is(GameBinariesUpdateTaskImpl.Companion.getBINARIES_TO_COPY().size()));
+    for (String fileName : GameBinariesUpdateTaskImpl.Companion.getBINARIES_TO_COPY()) {
       assertTrue(java.nio.file.Files.exists(fafBinPath.resolve(fileName)));
     }
   }

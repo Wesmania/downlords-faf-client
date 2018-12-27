@@ -25,7 +25,7 @@ public class Scratch extends Application {
     primaryStage.show();
 
     ITaskbarList3 taskBar = CompletableFuture.supplyAsync(() -> noCatch(() -> newInstance(ITaskbarList3.class))).join();
-    long hwndVal = com.sun.jna.Pointer.nativeValue(JavaFxUtil.getNativeWindow());
+    long hwndVal = com.sun.jna.Pointer.nativeValue(JavaFxUtil.Companion.getNativeWindow());
     Pointer taskBarPointer = Pointer.pointerToAddress(hwndVal, (PointerIO) null);
     taskBar.SetProgressState(taskBarPointer, TbpFlag.TBPF_ERROR);
     taskBar.SetProgressValue(taskBarPointer, 50, 100);

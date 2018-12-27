@@ -74,9 +74,9 @@ public class ModCardControllerTest extends AbstractPlainJavaFxTest {
     when(modService.loadThumbnail(modVersion)).thenReturn(new Image("/theme/images/close.png"));
     instance.setModVersion(modVersion);
 
-    assertThat(instance.nameLabel.getText(), is("ModVersion name"));
-    assertThat(instance.authorLabel.getText(), is("ModVersion author"));
-    assertThat(instance.thumbnailImageView.getImage(), is(notNullValue()));
+    assertThat(instance.getNameLabel().getText(), is("ModVersion name"));
+    assertThat(instance.getAuthorLabel().getText(), is("ModVersion author"));
+    assertThat(instance.getThumbnailImageView().getImage(), is(notNullValue()));
     verify(modService).loadThumbnail(modVersion);
   }
 
@@ -93,14 +93,14 @@ public class ModCardControllerTest extends AbstractPlainJavaFxTest {
 
     instance.setModVersion(modVersion);
 
-    assertThat(instance.thumbnailImageView.getImage(), notNullValue());
+    assertThat(instance.getThumbnailImageView().getImage(), notNullValue());
   }
 
   @Test
   public void testGetRoot() throws Exception {
     assertThat(instance.getRoot(), is(instanceOf(JFXRippler.class)));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
-    assertThat(((JFXRippler) instance.getRoot()).getControl(), is(instance.modTileRoot));
+    assertThat(((JFXRippler) instance.getRoot()).getControl(), is(instance.getModTileRoot()));
   }
 
   @Test
@@ -116,6 +116,6 @@ public class ModCardControllerTest extends AbstractPlainJavaFxTest {
   public void testUiModLabel() {
     ModVersion modVersion = ModInfoBeanBuilder.create().defaultValues().modType(ModType.UI).get();
     instance.setModVersion(modVersion);
-    assertThat(instance.typeLabel.getText(), equalTo(ModType.UI.name()));
+    assertThat(instance.getTypeLabel().getText(), equalTo(ModType.UI.name()));
   }
 }

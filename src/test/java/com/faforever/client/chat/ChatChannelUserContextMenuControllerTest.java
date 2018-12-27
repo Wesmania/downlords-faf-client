@@ -186,9 +186,9 @@ public class ChatChannelUserContextMenuControllerTest extends AbstractPlainJavaF
 
   @Test
   public void onSelectAvatar() throws Exception {
-    instance.avatarComboBox.show();
+    instance.getAvatarComboBox().show();
 
-    WaitForAsyncUtils.waitForAsyncFx(100_000, () -> instance.avatarComboBox.getSelectionModel().select(2));
+    WaitForAsyncUtils.waitForAsyncFx(100_000, () -> instance.getAvatarComboBox().getSelectionModel().select(2));
 
     ArgumentCaptor<AvatarBean> captor = ArgumentCaptor.forClass(AvatarBean.class);
     verify(avatarService).changeAvatar(captor.capture());
@@ -202,6 +202,6 @@ public class ChatChannelUserContextMenuControllerTest extends AbstractPlainJavaF
   public void testHideUserInfoIfNoPlayer() {
     chatUser.setPlayer(null);
     instance.setChatUser(chatUser);
-    assertThat(instance.showUserInfo.isVisible(), is(false));
+    assertThat(instance.getShowUserInfo().isVisible(), is(false));
   }
 }

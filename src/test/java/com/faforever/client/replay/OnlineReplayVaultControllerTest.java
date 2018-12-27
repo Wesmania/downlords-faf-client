@@ -109,7 +109,7 @@ public class OnlineReplayVaultControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.replayVaultRoot));
+    assertThat(instance.getRoot(), is(instance.getReplayVaultRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
@@ -123,7 +123,7 @@ public class OnlineReplayVaultControllerTest extends AbstractPlainJavaFxTest {
 
     verify(replayService).getNewestReplays(anyInt(), eq(1));
     verify(replayService).getHighestRatedReplays(anyInt(), eq(1));
-    assertThat(instance.moreButton.isVisible(), is(false));
+    assertThat(instance.getMoreButton().isVisible(), is(false));
   }
 
   @Test
@@ -134,8 +134,8 @@ public class OnlineReplayVaultControllerTest extends AbstractPlainJavaFxTest {
 
     searchListener.accept(standardSearchConfig);
 
-    assertThat(instance.showroomGroup.isVisible(), is(false));
-    assertThat(instance.searchResultGroup.isVisible(), is(true));
+    assertThat(instance.getShowroomGroup().isVisible(), is(false));
+    assertThat(instance.getSearchResultGroup().isVisible(), is(true));
     verify(replayService).findByQuery("query", MAX_RESULTS, 1, sortOrder);
   }
 
@@ -186,7 +186,7 @@ public class OnlineReplayVaultControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.waitForFxEvents();
     verify(replayService).findByQuery("query", MAX_RESULTS, 1, sortOrder);
     verify(replayService).findByQuery("query", MAX_RESULTS, 2, sortOrder);
-    assertThat(instance.moreButton.isVisible(), is(true));
+    assertThat(instance.getMoreButton().isVisible(), is(true));
   }
 
 }

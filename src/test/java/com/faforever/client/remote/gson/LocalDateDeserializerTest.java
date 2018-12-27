@@ -21,7 +21,7 @@ public class LocalDateDeserializerTest {
 
   @Before
   public void setUp() throws Exception {
-    instance = LocalDateDeserializer.INSTANCE;
+    instance = LocalDateDeserializer.Companion.getINSTANCE();
 
     json = mock(JsonElement.class);
     typeOfT = mock(Type.class);

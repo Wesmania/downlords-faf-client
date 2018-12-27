@@ -40,23 +40,23 @@ public class TrayIconManagerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void onSetApplicationBadgeEventOfNewValue() throws Exception {
-    instance.onSetApplicationBadgeEvent(UpdateApplicationBadgeEvent.ofNewValue(1));
+    instance.onSetApplicationBadgeEvent(UpdateApplicationBadgeEvent.Companion.ofNewValue(1));
     WaitForAsyncUtils.waitForFxEvents();
 
     Path tmpDir = temporaryFolder.getRoot().toPath();
 
-    getStage().getIcons().forEach(image -> JavaFxUtil.persistImage(image, tmpDir.resolve((int) image.getWidth() + ".png"), "png"));
+    getStage().getIcons().forEach(image -> JavaFxUtil.Companion.persistImage(image, tmpDir.resolve((int) image.getWidth() + ".png"), "png"));
     assertThat(getStage().getIcons(), hasSize(5));
   }
 
   @Test
   public void onSetApplicationBadgeEventOfDelta() throws Exception {
-    instance.onSetApplicationBadgeEvent(UpdateApplicationBadgeEvent.ofDelta(1));
+    instance.onSetApplicationBadgeEvent(UpdateApplicationBadgeEvent.Companion.ofDelta(1));
     WaitForAsyncUtils.waitForFxEvents();
 
     Path tmpDir = temporaryFolder.getRoot().toPath();
 
-    getStage().getIcons().forEach(image -> JavaFxUtil.persistImage(image, tmpDir.resolve((int) image.getWidth() + ".png"), "png"));
+    getStage().getIcons().forEach(image -> JavaFxUtil.Companion.persistImage(image, tmpDir.resolve((int) image.getWidth() + ".png"), "png"));
     assertThat(getStage().getIcons(), hasSize(5));
   }
 }

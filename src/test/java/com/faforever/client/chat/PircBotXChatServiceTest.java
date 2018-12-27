@@ -279,7 +279,7 @@ public class PircBotXChatServiceTest extends AbstractPlainJavaFxTest {
 
   private CountDownLatch listenForConnected() {
     CountDownLatch latch = new CountDownLatch(1);
-    instance.connectionState.addListener((observable, oldValue, newValue) -> {
+    instance.getConnectionState().addListener((observable, oldValue, newValue) -> {
       if (newValue == ConnectionState.CONNECTED) {
         latch.countDown();
       }
@@ -474,7 +474,7 @@ public class PircBotXChatServiceTest extends AbstractPlainJavaFxTest {
   public void testAddOnChatConnectedListener() throws Exception {
     CompletableFuture<Boolean> onChatConnectedFuture = new CompletableFuture<>();
 
-    instance.connectionState.addListener((observable, oldValue, newValue) -> {
+    instance.getConnectionState().addListener((observable, oldValue, newValue) -> {
       switch (newValue) {
         case CONNECTED:
           onChatConnectedFuture.complete(null);
@@ -493,7 +493,7 @@ public class PircBotXChatServiceTest extends AbstractPlainJavaFxTest {
   @Test
   public void testAddOnChatDisconnectedListener() throws Exception {
     CompletableFuture<Void> onChatDisconnectedFuture = new CompletableFuture<>();
-    instance.connectionState.addListener((observable, oldValue, newValue) -> {
+    instance.getConnectionState().addListener((observable, oldValue, newValue) -> {
       switch (newValue) {
         case DISCONNECTED:
           onChatDisconnectedFuture.complete(null);
@@ -511,7 +511,7 @@ public class PircBotXChatServiceTest extends AbstractPlainJavaFxTest {
 
   private CompletableFuture<Void> listenForDisconnected() {
     CompletableFuture<Void> future = new CompletableFuture<>();
-    instance.connectionState.addListener((observable, oldValue, newValue) -> {
+    instance.getConnectionState().addListener((observable, oldValue, newValue) -> {
       if (newValue == ConnectionState.DISCONNECTED) {
         future.complete(null);
       }
@@ -541,7 +541,7 @@ public class PircBotXChatServiceTest extends AbstractPlainJavaFxTest {
   @SuppressWarnings("unchecked")
   private CompletableFuture<Boolean> listenForUserOp(ChatChannelUser chatUser) {
     CompletableFuture<Boolean> future = new CompletableFuture<>();
-    JavaFxUtil.addListener(chatUser.moderatorProperty(), (observable, oldValue, newValue) -> {
+    JavaFxUtil.Companion.addListener(chatUser.moderatorProperty(), (observable, oldValue, newValue) -> {
       if (newValue) {
         future.complete(newValue);
       }
@@ -717,7 +717,7 @@ public class PircBotXChatServiceTest extends AbstractPlainJavaFxTest {
     connect();
     botStartedFuture.get(TIMEOUT, TIMEOUT_UNIT);
 
-    instance.connectionState.set(ConnectionState.CONNECTED);
+    instance.getConnectionState().set(ConnectionState.CONNECTED);
 
     String channelToJoin = "#anotherChannel";
     instance.joinChannel(channelToJoin);
@@ -743,7 +743,7 @@ public class PircBotXChatServiceTest extends AbstractPlainJavaFxTest {
     when(nickServHostMask.getHostmask()).thenReturn("nickserv");
     firePircBotXEvent(new NoticeEvent(pircBotX, nickServHostMask, null, null, "", "User foo isn't registered", ImmutableMap.of()));
 
-    instance.connectionState.set(ConnectionState.CONNECTED);
+    instance.getConnectionState().set(ConnectionState.CONNECTED);
 
     String md5sha256Password = Hashing.md5().hashString(Hashing.sha256().hashString(password, UTF_8).toString(), UTF_8).toString();
     verify(outputIrc, timeout(100)).message("nickserv", String.format("register %s junit@users.faforever.com", md5sha256Password));
@@ -756,7 +756,7 @@ public class PircBotXChatServiceTest extends AbstractPlainJavaFxTest {
 
     assertThat(instance.getOrCreateChannel(DEFAULT_CHANNEL_NAME).getUsers(), hasSize(1));
 
-    instance.connectionState.set(ConnectionState.DISCONNECTED);
+    instance.getConnectionState().set(ConnectionState.DISCONNECTED);
 
     assertThat(instance.getOrCreateChannel(DEFAULT_CHANNEL_NAME).getUsers(), empty());
   }

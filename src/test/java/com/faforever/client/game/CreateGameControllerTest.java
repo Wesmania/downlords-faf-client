@@ -97,9 +97,9 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testMapSearchTextFieldFilteringEmpty() {
-    instance.mapSearchTextField.setText("Test");
+    instance.getMapSearchTextField().setText("Test");
 
-    assertThat(instance.filteredMapBeans.getSource(), empty());
+    assertThat(instance.getFilteredMapBeans().getSource(), empty());
   }
 
   @Test
@@ -108,56 +108,56 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     mapList.add(MapBuilder.create().defaultValues().folderName("test2").get());
     mapList.add(MapBuilder.create().defaultValues().displayName("foo").get());
 
-    instance.mapSearchTextField.setText("Test");
+    instance.getMapSearchTextField().setText("Test");
 
-    assertThat(instance.filteredMapBeans.get(0).getFolderName(), is("test2"));
-    assertThat(instance.filteredMapBeans.get(1).getDisplayName(), is("Test1"));
+    assertThat(instance.getFilteredMapBeans().get(0).getFolderName(), is("test2"));
+    assertThat(instance.getFilteredMapBeans().get(1).getDisplayName(), is("Test1"));
   }
 
   @Test
   public void testMapSearchTextFieldKeyPressedUpForEmpty() {
-    instance.mapSearchTextField.setText("Test");
+    instance.getMapSearchTextField().setText("Test");
 
-    instance.mapSearchTextField.getOnKeyPressed().handle(keyUpPressed);
-    instance.mapSearchTextField.getOnKeyPressed().handle(keyUpReleased);
+    instance.getMapSearchTextField().getOnKeyPressed().handle(keyUpPressed);
+    instance.getMapSearchTextField().getOnKeyPressed().handle(keyUpReleased);
 
-    assertThat(instance.mapListView.getSelectionModel().getSelectedIndex(), is(-1));
+    assertThat(instance.getMapListView().getSelectionModel().getSelectedIndex(), is(-1));
   }
 
   @Test
   public void testMapSearchTextFieldKeyPressedDownForEmpty() {
-    instance.mapSearchTextField.setText("Test");
+    instance.getMapSearchTextField().setText("Test");
 
-    instance.mapSearchTextField.getOnKeyPressed().handle(keyDownPressed);
-    instance.mapSearchTextField.getOnKeyPressed().handle(keyDownReleased);
+    instance.getMapSearchTextField().getOnKeyPressed().handle(keyDownPressed);
+    instance.getMapSearchTextField().getOnKeyPressed().handle(keyDownReleased);
 
-    assertThat(instance.mapListView.getSelectionModel().getSelectedIndex(), is(-1));
+    assertThat(instance.getMapListView().getSelectionModel().getSelectedIndex(), is(-1));
   }
 
   @Test
   public void testMapSearchTextFieldKeyPressedUpForPopulated() {
     mapList.add(MapBuilder.create().defaultValues().displayName("Test1").get());
     mapList.add(MapBuilder.create().defaultValues().displayName("Test1").get());
-    instance.mapSearchTextField.setText("Test");
+    instance.getMapSearchTextField().setText("Test");
 
-    instance.mapSearchTextField.getOnKeyPressed().handle(keyDownPressed);
-    instance.mapSearchTextField.getOnKeyPressed().handle(keyDownReleased);
-    instance.mapSearchTextField.getOnKeyPressed().handle(keyUpPressed);
-    instance.mapSearchTextField.getOnKeyPressed().handle(keyUpReleased);
+    instance.getMapSearchTextField().getOnKeyPressed().handle(keyDownPressed);
+    instance.getMapSearchTextField().getOnKeyPressed().handle(keyDownReleased);
+    instance.getMapSearchTextField().getOnKeyPressed().handle(keyUpPressed);
+    instance.getMapSearchTextField().getOnKeyPressed().handle(keyUpReleased);
 
-    assertThat(instance.mapListView.getSelectionModel().getSelectedIndex(), is(0));
+    assertThat(instance.getMapListView().getSelectionModel().getSelectedIndex(), is(0));
   }
 
   @Test
   public void testMapSearchTextFieldKeyPressedDownForPopulated() {
     mapList.add(MapBuilder.create().defaultValues().displayName("Test1").get());
     mapList.add(MapBuilder.create().defaultValues().displayName("Test1").get());
-    instance.mapSearchTextField.setText("Test");
+    instance.getMapSearchTextField().setText("Test");
 
-    instance.mapSearchTextField.getOnKeyPressed().handle(keyDownPressed);
-    instance.mapSearchTextField.getOnKeyPressed().handle(keyDownReleased);
+    instance.getMapSearchTextField().getOnKeyPressed().handle(keyDownPressed);
+    instance.getMapSearchTextField().getOnKeyPressed().handle(keyDownReleased);
 
-    assertThat(instance.mapListView.getSelectionModel().getSelectedIndex(), is(1));
+    assertThat(instance.getMapListView().getSelectionModel().getSelectedIndex(), is(1));
   }
 
   @Test
@@ -168,7 +168,7 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(() -> instance.initialize());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.titleTextField.getText(), is("testGame"));
+    assertThat(instance.getTitleTextField().getText(), is("testGame"));
   }
 
 
@@ -180,8 +180,8 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(() -> instance.initialize());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.titleTextField.getText(), is("123"));
-    assertThat(instance.createGameButton.getText(), is("Mod missing"));
+    assertThat(instance.getTitleTextField().getText(), is("123"));
+    assertThat(instance.getCreateGameButton().getText(), is("Mod missing"));
   }
 
   @Test
@@ -192,8 +192,8 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(() -> instance.initialize());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.titleTextField.getText(), is(""));
-    assertThat(instance.createGameButton.getText(), is("title missing"));
+    assertThat(instance.getTitleTextField().getText(), is(""));
+    assertThat(instance.getCreateGameButton().getText(), is("title missing"));
   }
 
   @Test
@@ -204,8 +204,8 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(() -> instance.initialize());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.titleTextField.getText(), is(""));
-    assertThat(instance.createGameButton.getText(), is("disconnected"));
+    assertThat(instance.getTitleTextField().getText(), is(""));
+    assertThat(instance.getCreateGameButton().getText(), is("disconnected"));
   }
 
   @Test
@@ -216,8 +216,8 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(() -> instance.initialize());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.titleTextField.getText(), is(""));
-    assertThat(instance.createGameButton.getText(), is("connecting"));
+    assertThat(instance.getTitleTextField().getText(), is(""));
+    assertThat(instance.getCreateGameButton().getText(), is("connecting"));
   }
 
   @Test
@@ -231,7 +231,7 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(() -> instance.initialize());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.mapListView.getSelectionModel().getSelectedItem(), is(lastMapBean));
+    assertThat(instance.getMapListView().getSelectionModel().getSelectedItem(), is(lastMapBean));
   }
 
   @Test
@@ -239,7 +239,7 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     instance = new CreateGameController(fafService, mapService, modService, gameService, preferencesService, i18n, notificationService, reportingService);
     loadFxml("theme/play/create_game.fxml", clazz -> instance);
 
-    assertThat(instance.featuredModListView.getItems(), empty());
+    assertThat(instance.getFeaturedModListView().getItems(), empty());
   }
 
   @Test
@@ -250,14 +250,14 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(() -> instance.initialize());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.featuredModListView.getItems(), hasSize(1));
-    assertThat(instance.featuredModListView.getItems().get(0), is(featuredMod));
+    assertThat(instance.getFeaturedModListView().getItems(), hasSize(1));
+    assertThat(instance.getFeaturedModListView().getItems().get(0), is(featuredMod));
   }
 
   @Test
   public void testSelectLastOrDefaultSelectDefault() {
     FeaturedMod featuredMod = FeaturedModBeanBuilder.create().defaultValues().technicalName("something").get();
-    FeaturedMod featuredMod2 = FeaturedModBeanBuilder.create().defaultValues().technicalName(KnownFeaturedMod.DEFAULT.getTechnicalName()).get();
+    FeaturedMod featuredMod2 = FeaturedModBeanBuilder.create().defaultValues().technicalName(KnownFeaturedMod.Companion.getDEFAULT().getTechnicalName()).get();
 
     preferences.setLastGameType(null);
     when(modService.getFeaturedMods()).thenReturn(completedFuture(asList(featuredMod, featuredMod2)));
@@ -265,13 +265,13 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(() -> instance.initialize());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.featuredModListView.getSelectionModel().getSelectedItem(), is(featuredMod2));
+    assertThat(instance.getFeaturedModListView().getSelectionModel().getSelectedItem(), is(featuredMod2));
   }
 
   @Test
   public void testSelectLastOrDefaultSelectLast() {
     FeaturedMod featuredMod = FeaturedModBeanBuilder.create().defaultValues().technicalName("last").get();
-    FeaturedMod featuredMod2 = FeaturedModBeanBuilder.create().defaultValues().technicalName(KnownFeaturedMod.DEFAULT.getTechnicalName()).get();
+    FeaturedMod featuredMod2 = FeaturedModBeanBuilder.create().defaultValues().technicalName(KnownFeaturedMod.Companion.getDEFAULT().getTechnicalName()).get();
 
     preferences.setLastGameType("last");
     when(modService.getFeaturedMods()).thenReturn(completedFuture(asList(featuredMod, featuredMod2)));
@@ -279,12 +279,12 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(() -> instance.initialize());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.featuredModListView.getSelectionModel().getSelectedItem(), is(featuredMod));
+    assertThat(instance.getFeaturedModListView().getSelectionModel().getSelectedItem(), is(featuredMod));
   }
 
   @Test
   public void testInitModListPopulated() {
-    assertThat(instance.modListView.getItems(), empty());
+    assertThat(instance.getModListView().getItems(), empty());
 
     ModVersion modVersion1 = mock(ModVersion.class);
     ModVersion modVersion2 = mock(ModVersion.class);
@@ -296,15 +296,15 @@ public class CreateGameControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(() -> instance.initialize());
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.modListView.getItems(), hasSize(2));
-    assertThat(instance.modListView.getItems(), contains(modVersion1, modVersion2));
+    assertThat(instance.getModListView().getItems(), hasSize(2));
+    assertThat(instance.getModListView().getItems(), contains(modVersion1, modVersion2));
   }
 
   @Test
   public void testOnlyFriendsBinding() {
-    instance.onlyForFriendsCheckBox.setSelected(true);
+    instance.getOnlyForFriendsCheckBox().setSelected(true);
     assertThat(preferences.isLastGameOnlyFriends(), is(true));
-    instance.onlyForFriendsCheckBox.setSelected(false);
+    instance.getOnlyForFriendsCheckBox().setSelected(false);
     assertThat(preferences.isLastGameOnlyFriends(), is(false));
   }
 }

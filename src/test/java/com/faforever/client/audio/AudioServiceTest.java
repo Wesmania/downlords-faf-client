@@ -35,7 +35,7 @@ public class AudioServiceTest extends AbstractPlainJavaFxTest {
     notificationsPrefs = preferences.getNotification();
 
     when(preferencesService.getPreferences()).thenReturn(preferences);
-    when(uiService.getThemeFileUrl(any())).thenReturn(getThemeFileUrl(UiService.MENTION_SOUND));
+    when(uiService.getThemeFileUrl(any())).thenReturn(getThemeFileUrl(UiService.Companion.getMENTION_SOUND()));
 
     instance.postConstruct();
 

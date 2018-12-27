@@ -58,7 +58,7 @@ public class FaInitGeneratorTest {
 
     instance.generateInitFile(mountPaths, new HashSet<>(Arrays.asList("/schook", "/labwars")));
 
-    Path targetFile = fafBinDirectory.getRoot().toPath().resolve(ForgedAlliancePrefs.INIT_FILE_NAME);
+    Path targetFile = fafBinDirectory.getRoot().toPath().resolve(ForgedAlliancePrefs.Companion.getINIT_FILE_NAME());
     assertTrue(Files.exists(targetFile));
 
     String fileContent = new String(Files.readAllBytes(targetFile), UTF_8);

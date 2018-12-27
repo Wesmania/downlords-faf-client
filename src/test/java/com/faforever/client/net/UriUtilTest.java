@@ -9,12 +9,12 @@ public class UriUtilTest {
 
   @Test
   public void testFromStringValid() throws Exception {
-    UriUtil.fromString("http://localhost");
+    UriUtil.Companion.fromString("http://localhost");
   }
 
   @Test(expected = RuntimeException.class)
   public void testFromStringInvalid() throws Exception {
-    UriUtil.fromString("^");
+    UriUtil.Companion.fromString("^");
   }
 
   @Test

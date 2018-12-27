@@ -105,7 +105,7 @@ public class AbstractChatTabControllerTest extends AbstractPlainJavaFxTest {
 
     preferences = new Preferences();
 
-    when(uiService.getThemeFileUrl(any())).thenReturn(getClass().getResource("/" + UiService.CHAT_SECTION_EXTENDED));
+    when(uiService.getThemeFileUrl(any())).thenReturn(getClass().getResource("/" + UiService.Companion.getCHAT_SECTION_EXTENDED()));
     when(timeService.asShortTime(any())).thenReturn("123");
     when(userService.getUsername()).thenReturn("junit");
     when(preferencesService.getPreferences()).thenReturn(preferences);
@@ -137,7 +137,7 @@ public class AbstractChatTabControllerTest extends AbstractPlainJavaFxTest {
     getRoot().getChildren().setAll(tabPane);
 
     chatReadyLatch = new CountDownLatch(1);
-    JavaFxUtil.addListener(instance.getMessagesWebView().getEngine().getLoadWorker().stateProperty(), (observable, oldValue, newValue) -> {
+    JavaFxUtil.Companion.addListener(instance.getMessagesWebView().getEngine().getLoadWorker().stateProperty(), (observable, oldValue, newValue) -> {
       if (Worker.State.SUCCEEDED.equals(newValue)) {
         chatReadyLatch.countDown();
       }
@@ -307,7 +307,7 @@ public class AbstractChatTabControllerTest extends AbstractPlainJavaFxTest {
   public void getMessageCssClassChatOnly() {
     String playerName = "somePlayer";
     when(playerService.getPlayerForUsername(playerName)).thenReturn(Optional.empty());
-    assertEquals(instance.getMessageCssClass(playerName), CSS_CLASS_CHAT_ONLY);
+    assertEquals(instance.getMessageCssClass(playerName), Companion.getCSS_CLASS_CHAT_ONLY());
   }
 
   @Test
@@ -322,6 +322,6 @@ public class AbstractChatTabControllerTest extends AbstractPlainJavaFxTest {
   @Test
   public void getMessageCssClassChatOnlyNullPlayerInfoBean() {
     String playerName = "somePlayer";
-    assertEquals(instance.getMessageCssClass(playerName), CSS_CLASS_CHAT_ONLY);
+    assertEquals(instance.getMessageCssClass(playerName), Companion.getCSS_CLASS_CHAT_ONLY());
   }
 }

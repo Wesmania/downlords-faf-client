@@ -129,7 +129,7 @@ public class MapServiceTest extends AbstractPlainJavaFxTest {
     assertThat(mapBean, notNullValue());
     assertThat(mapBean.getFolderName(), is("SCMP_001"));
     assertThat(mapBean.getDisplayName(), is("Burial Mounds"));
-    assertThat(mapBean.getSize(), equalTo(MapSize.valueOf(1024, 1024)));
+    assertThat(mapBean.getSize(), equalTo(MapSize.Companion.valueOf(1024, 1024)));
   }
 
   @Test
@@ -158,7 +158,7 @@ public class MapServiceTest extends AbstractPlainJavaFxTest {
     assertThat(mapBean, notNullValue());
     assertThat(mapBean.getId(), isEmptyOrNullString());
     assertThat(mapBean.getDescription(), startsWith("Initial scans of the planet"));
-    assertThat(mapBean.getSize(), is(MapSize.valueOf(1024, 1024)));
+    assertThat(mapBean.getSize(), is(MapSize.Companion.valueOf(1024, 1024)));
     assertThat(mapBean.getVersion(), is(new ComparableVersion("1")));
     assertThat(mapBean.getFolderName(), is("SCMP_001"));
   }
@@ -176,7 +176,7 @@ public class MapServiceTest extends AbstractPlainJavaFxTest {
   @Test
   public void testLoadPreview() {
     for (PreviewSize previewSize : PreviewSize.values()) {
-      Path cacheSubDir = Paths.get("maps").resolve(previewSize.folderName);
+      Path cacheSubDir = Paths.get("maps").resolve(previewSize.getFolderName());
       instance.loadPreview("preview", previewSize);
       verify(assetService).loadAndCacheImage(any(URL.class), eq(cacheSubDir), any());
     }

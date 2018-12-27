@@ -85,11 +85,11 @@ public class ServerAccessorImplTest extends AbstractPlainJavaFxTest {
   private static final InetAddress LOOPBACK_ADDRESS = InetAddress.getLoopbackAddress();
   private static final Gson gson = new GsonBuilder()
       .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-      .registerTypeAdapter(ClientMessageType.class, ClientMessageTypeTypeAdapter.INSTANCE)
-      .registerTypeAdapter(FafServerMessageType.class, ServerMessageTypeTypeAdapter.INSTANCE)
-      .registerTypeAdapter(MessageTarget.class, MessageTargetTypeAdapter.INSTANCE)
+      .registerTypeAdapter(ClientMessageType.class, ClientMessageTypeTypeAdapter.Companion.getINSTANCE())
+      .registerTypeAdapter(FafServerMessageType.class, ServerMessageTypeTypeAdapter.Companion.getINSTANCE())
+      .registerTypeAdapter(MessageTarget.class, MessageTargetTypeAdapter.Companion.getINSTANCE())
       .registerTypeAdapter(Faction.class, new FactionDeserializer())
-      .registerTypeAdapter(RatingRange.class, RatingRangeTypeAdapter.INSTANCE)
+      .registerTypeAdapter(RatingRange.class, RatingRangeTypeAdapter.Companion.getINSTANCE())
       .create();
 
   @Rule

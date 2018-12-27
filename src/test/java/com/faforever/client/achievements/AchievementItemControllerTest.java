@@ -40,24 +40,24 @@ public class AchievementItemControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.achievementItemRoot));
+    assertThat(instance.getRoot(), is(instance.getAchievementItemRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
   @Test
   public void testSetAchievementDefinition() throws Exception {
     AchievementDefinition achievementDefinition = AchievementDefinitionBuilder.create().defaultValues().get();
-    when(achievementService.getImage(achievementDefinition, AchievementState.REVEALED)).thenReturn(new Image(getThemeFile(DEFAULT_ACHIEVEMENT_IMAGE)));
+    when(achievementService.getImage(achievementDefinition, AchievementState.REVEALED)).thenReturn(new Image(getThemeFile(Companion.getDEFAULT_ACHIEVEMENT_IMAGE())));
 
     instance.setAchievementDefinition(achievementDefinition);
 
-    assertThat(instance.nameLabel.getText(), is(achievementDefinition.getName()));
-    assertThat(instance.descriptionLabel.getText(), is(achievementDefinition.getDescription()));
-    assertThat(instance.pointsLabel.getText(), is(String.format("%d", achievementDefinition.getExperiencePoints())));
-    assertThat(instance.imageView.getImage(), notNullValue());
-    assertThat(instance.imageView.getEffect(), is(instanceOf(ColorAdjust.class)));
-    assertThat(instance.imageView.getOpacity(), is(0.5));
-    assertThat(instance.progressBar.isVisible(), is(true));
+    assertThat(instance.getNameLabel().getText(), is(achievementDefinition.getName()));
+    assertThat(instance.getDescriptionLabel().getText(), is(achievementDefinition.getDescription()));
+    assertThat(instance.getPointsLabel().getText(), is(String.format("%d", achievementDefinition.getExperiencePoints())));
+    assertThat(instance.getImageView().getImage(), notNullValue());
+    assertThat(instance.getImageView().getEffect(), is(instanceOf(ColorAdjust.class)));
+    assertThat(instance.getImageView().getOpacity(), is(0.5));
+    assertThat(instance.getProgressBar().isVisible(), is(true));
   }
 
   @Test
@@ -66,8 +66,8 @@ public class AchievementItemControllerTest extends AbstractPlainJavaFxTest {
         .type(AchievementType.STANDARD)
         .get());
 
-    assertThat(instance.progressBar.isVisible(), is(false));
-    assertThat(instance.progressLabel.isVisible(), is(false));
+    assertThat(instance.getProgressBar().isVisible(), is(false));
+    assertThat(instance.getProgressLabel().isVisible(), is(false));
   }
 
   @Test
@@ -83,7 +83,7 @@ public class AchievementItemControllerTest extends AbstractPlainJavaFxTest {
 
     instance.setPlayerAchievement(playerAchievement);
 
-    assertThat(instance.progressBar.getProgress(), is(0.0));
+    assertThat(instance.getProgressBar().getProgress(), is(0.0));
   }
 
   @Test(expected = IllegalStateException.class)
@@ -111,8 +111,8 @@ public class AchievementItemControllerTest extends AbstractPlainJavaFxTest {
         .get();
 
     instance.setPlayerAchievement(playerAchievement);
-    assertThat(instance.imageView.getEffect(), is(instanceOf(ColorAdjust.class)));
-    assertThat(instance.imageView.getOpacity(), is(0.5));
+    assertThat(instance.getImageView().getEffect(), is(instanceOf(ColorAdjust.class)));
+    assertThat(instance.getImageView().getOpacity(), is(0.5));
   }
 
   @Test
@@ -125,9 +125,9 @@ public class AchievementItemControllerTest extends AbstractPlainJavaFxTest {
         .get();
 
     instance.setPlayerAchievement(playerAchievement);
-    assertThat(instance.imageView.getEffect(), is(nullValue()));
-    assertThat(instance.imageView.getOpacity(), is(1.0));
-    assertThat(instance.progressBar.isVisible(), is(true));
-    assertThat(instance.progressBar.getProgress(), is(0.5));
+    assertThat(instance.getImageView().getEffect(), is(nullValue()));
+    assertThat(instance.getImageView().getOpacity(), is(1.0));
+    assertThat(instance.getProgressBar().isVisible(), is(true));
+    assertThat(instance.getProgressBar().getProgress(), is(0.5));
   }
 }

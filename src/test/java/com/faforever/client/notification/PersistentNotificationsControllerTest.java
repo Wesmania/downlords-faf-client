@@ -35,7 +35,7 @@ public class PersistentNotificationsControllerTest extends AbstractPlainJavaFxTe
   @Before
   public void setUp() throws Exception {
     instance = new PersistentNotificationsController(notificationService, audioService, uiService);
-    instance.persistentNotificationsRoot = new Pane();
+    instance.setPersistentNotificationsRoot(new Pane());
 
     loadFxml("theme/persistent_notifications.fxml", clazz -> instance);
   }
@@ -49,7 +49,7 @@ public class PersistentNotificationsControllerTest extends AbstractPlainJavaFxTe
 
   @Test
   public void testGetRoot() throws Exception {
-    assertEquals(instance.persistentNotificationsRoot, instance.getRoot());
+    assertEquals(instance.getPersistentNotificationsRoot(), instance.getRoot());
   }
 
   @Test

@@ -44,14 +44,14 @@ public class TransientNotificationControllerTest extends AbstractPlainJavaFxTest
     TransientNotification notification = new TransientNotification("title", "text", image);
     instance.setNotification(notification);
 
-    assertEquals("title", instance.titleLabel.getText());
-    assertEquals("text", instance.messageLabel.getText());
-    assertEquals(image, instance.imageView.getImage());
+    assertEquals("title", instance.getTitleLabel().getText());
+    assertEquals("text", instance.getMessageLabel().getText());
+    assertEquals(image, instance.getImageView().getImage());
   }
 
   @Test
   public void testGetRoot() throws Exception {
-    Assert.assertThat(instance.getRoot(), is(instance.transientNotificationRoot));
+    Assert.assertThat(instance.getRoot(), is(instance.getTransientNotificationRoot()));
     Assert.assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 

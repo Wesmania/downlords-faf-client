@@ -103,7 +103,7 @@ public class MapVaultControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.mapVaultRoot));
+    assertThat(instance.getRoot(), is(instance.getMapVaultRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
@@ -125,9 +125,9 @@ public class MapVaultControllerTest extends AbstractPlainJavaFxTest {
     when(mapService.getMostPlayedMaps(anyInt(), eq(1))).thenReturn(CompletableFuture.completedFuture(maps));
 
     CountDownLatch latch = new CountDownLatch(3);
-    waitUntilInitialized(instance.mostLikedPane, latch);
-    waitUntilInitialized(instance.newestPane, latch);
-    waitUntilInitialized(instance.mostPlayedPane, latch);
+    waitUntilInitialized(instance.getMostLikedPane(), latch);
+    waitUntilInitialized(instance.getNewestPane(), latch);
+    waitUntilInitialized(instance.getMostPlayedPane(), latch);
 
     instance.display(new OpenMapVaultEvent());
 

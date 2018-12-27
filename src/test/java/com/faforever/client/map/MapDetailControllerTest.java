@@ -95,8 +95,8 @@ public class MapDetailControllerTest extends AbstractPlainJavaFxTest {
   public void onInstallButtonClicked() {
     instance.onInstallButtonClicked();
     WaitForAsyncUtils.waitForFxEvents();
-    assertThat(instance.uninstallButton.isVisible(), is(true));
-    assertThat(instance.installButton.isVisible(), is(false));
+    assertThat(instance.getUninstallButton().isVisible(), is(true));
+    assertThat(instance.getInstallButton().isVisible(), is(false));
   }
 
   @Test
@@ -111,12 +111,12 @@ public class MapDetailControllerTest extends AbstractPlainJavaFxTest {
     mapBean.setRanked(true);
     mapBean.setHidden(false);
     mapBean.setId("23");
-    mapBean.setSize(MapSize.valueOf(1, 1));
+    mapBean.setSize(MapSize.Companion.valueOf(1, 1));
     mapBean.setDownloadUrl(new URL("http://google.com"));
     instance.setMap(mapBean);
 
-    assertThat(instance.hideRow.getPrefHeight(), not(is(0)));
-    assertThat(instance.unrankButton.isVisible(), is(true));
+    assertThat(instance.getHideRow().getPrefHeight(), not(is(0)));
+    assertThat(instance.getUnrankButton().isVisible(), is(true));
   }
 
   @Test
@@ -130,11 +130,11 @@ public class MapDetailControllerTest extends AbstractPlainJavaFxTest {
     mapBean.setRanked(true);
     mapBean.setHidden(false);
     mapBean.setId("23");
-    mapBean.setSize(MapSize.valueOf(1, 1));
+    mapBean.setSize(MapSize.Companion.valueOf(1, 1));
     mapBean.setDownloadUrl(new URL("http://google.com"));
     instance.setMap(mapBean);
 
-    assertThat(instance.hideRow.getPrefHeight(), is(0.0));
-    assertThat(instance.unrankButton.isVisible(), is(false));
+    assertThat(instance.getHideRow().getPrefHeight(), is(0.0));
+    assertThat(instance.getUnrankButton().isVisible(), is(false));
   }
 }

@@ -16,8 +16,8 @@ public class ServerMessageSerializer extends JsonMessageSerializer<FafServerMess
   protected void addTypeAdapters(GsonBuilder gsonBuilder) {
     super.addTypeAdapters(gsonBuilder);
 
-    gsonBuilder.registerTypeAdapter(MessageTarget.class, MessageTargetTypeAdapter.INSTANCE);
-    gsonBuilder.registerTypeAdapter(FafServerMessageType.class, ServerMessageTypeTypeAdapter.INSTANCE);
-    gsonBuilder.registerTypeAdapter(RatingRange.class, RatingRangeTypeAdapter.INSTANCE);
+    gsonBuilder.registerTypeAdapter(MessageTarget.class, MessageTargetTypeAdapter.Companion.getINSTANCE());
+    gsonBuilder.registerTypeAdapter(FafServerMessageType.class, ServerMessageTypeTypeAdapter.Companion.getINSTANCE());
+    gsonBuilder.registerTypeAdapter(RatingRange.class, RatingRangeTypeAdapter.Companion.getINSTANCE());
   }
 }

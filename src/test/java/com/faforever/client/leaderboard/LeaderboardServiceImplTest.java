@@ -51,15 +51,15 @@ public class LeaderboardServiceImplTest {
   public void testGetLadder1v1Stats() throws Exception {
     LeaderboardEntry leaderboardEntry1 = new LeaderboardEntry();
     leaderboardEntry1.setRating(151);
-    leaderboardEntry1.setGamesPlayed(LeaderboardService.MINIMUM_GAMES_PLAYED_TO_BE_SHOWN);
+    leaderboardEntry1.setGamesPlayed(LeaderboardService.Companion.getMINIMUM_GAMES_PLAYED_TO_BE_SHOWN());
 
     LeaderboardEntry leaderboardEntry2 = new LeaderboardEntry();
     leaderboardEntry2.setRating(121);
-    leaderboardEntry2.setGamesPlayed(LeaderboardService.MINIMUM_GAMES_PLAYED_TO_BE_SHOWN + 42);
+    leaderboardEntry2.setGamesPlayed(LeaderboardService.Companion.getMINIMUM_GAMES_PLAYED_TO_BE_SHOWN() + 42);
 
     LeaderboardEntry leaderboardEntry3 = new LeaderboardEntry();
     leaderboardEntry3.setRating(221);
-    leaderboardEntry3.setGamesPlayed(LeaderboardService.MINIMUM_GAMES_PLAYED_TO_BE_SHOWN);
+    leaderboardEntry3.setGamesPlayed(LeaderboardService.Companion.getMINIMUM_GAMES_PLAYED_TO_BE_SHOWN());
 
     when(fafService.getLadder1v1Leaderboard()).thenReturn(CompletableFuture.completedFuture(Arrays.asList(
         leaderboardEntry1, leaderboardEntry2, leaderboardEntry3
@@ -84,15 +84,15 @@ public class LeaderboardServiceImplTest {
   public void testStatsOnlyShowsPlayersWithEnoughGamesPlayed() throws Exception {
     LeaderboardEntry leaderboardEntry1 = new LeaderboardEntry();
     leaderboardEntry1.setRating(151);
-    leaderboardEntry1.setGamesPlayed(LeaderboardService.MINIMUM_GAMES_PLAYED_TO_BE_SHOWN);
+    leaderboardEntry1.setGamesPlayed(LeaderboardService.Companion.getMINIMUM_GAMES_PLAYED_TO_BE_SHOWN());
 
     LeaderboardEntry leaderboardEntry2 = new LeaderboardEntry();
     leaderboardEntry2.setRating(121);
-    leaderboardEntry2.setGamesPlayed(LeaderboardService.MINIMUM_GAMES_PLAYED_TO_BE_SHOWN - 1);
+    leaderboardEntry2.setGamesPlayed(LeaderboardService.Companion.getMINIMUM_GAMES_PLAYED_TO_BE_SHOWN() - 1);
 
     LeaderboardEntry leaderboardEntry3 = new LeaderboardEntry();
     leaderboardEntry3.setRating(221);
-    leaderboardEntry3.setGamesPlayed(LeaderboardService.MINIMUM_GAMES_PLAYED_TO_BE_SHOWN - 1);
+    leaderboardEntry3.setGamesPlayed(LeaderboardService.Companion.getMINIMUM_GAMES_PLAYED_TO_BE_SHOWN() - 1);
 
     when(fafService.getLadder1v1Leaderboard()).thenReturn(CompletableFuture.completedFuture(Arrays.asList(
         leaderboardEntry1, leaderboardEntry2, leaderboardEntry3

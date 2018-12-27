@@ -50,7 +50,7 @@ public class LeaderboardControllerTest extends AbstractPlainJavaFxTest {
     )));
 
     CountDownLatch loadedLatch = new CountDownLatch(1);
-    instance.ratingTable.itemsProperty().addListener(observable -> loadedLatch.countDown());
+    instance.getRatingTable().itemsProperty().addListener(observable -> loadedLatch.countDown());
     instance.setRatingType(KnownFeaturedMod.LADDER_1V1);
 
     instance.display(new OpenLadder1v1LeaderboardEvent());
@@ -72,11 +72,11 @@ public class LeaderboardControllerTest extends AbstractPlainJavaFxTest {
     instance.setRatingType(KnownFeaturedMod.LADDER_1V1);
     instance.display(new OpenLadder1v1LeaderboardEvent());
 
-    assertThat(instance.ratingTable.getSelectionModel().getSelectedItem(), nullValue());
+    assertThat(instance.getRatingTable().getSelectionModel().getSelectedItem(), nullValue());
 
-    instance.searchTextField.setText("aa");
-    assertThat(instance.ratingTable.getItems(), hasSize(2));
-    assertThat(instance.ratingTable.getSelectionModel().getSelectedItem().getUsername(), is("Aa"));
+    instance.getSearchTextField().setText("aa");
+    assertThat(instance.getRatingTable().getItems(), hasSize(2));
+    assertThat(instance.getRatingTable().getSelectionModel().getSelectedItem().getUsername(), is("Aa"));
   }
 
   @Test
@@ -92,16 +92,16 @@ public class LeaderboardControllerTest extends AbstractPlainJavaFxTest {
     instance.setRatingType(KnownFeaturedMod.LADDER_1V1);
     instance.display(new OpenLadder1v1LeaderboardEvent());
 
-    assertThat(instance.ratingTable.getSelectionModel().getSelectedItem(), nullValue());
+    assertThat(instance.getRatingTable().getSelectionModel().getSelectedItem(), nullValue());
 
-    instance.searchTextField.setText("b");
-    assertThat(instance.ratingTable.getItems(), hasSize(2));
-    assertThat(instance.ratingTable.getSelectionModel().getSelectedItem().getUsername(), is("Ab"));
+    instance.getSearchTextField().setText("b");
+    assertThat(instance.getRatingTable().getItems(), hasSize(2));
+    assertThat(instance.getRatingTable().getSelectionModel().getSelectedItem().getUsername(), is("Ab"));
   }
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.leaderboardRoot));
+    assertThat(instance.getRoot(), is(instance.getLeaderboardRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 }

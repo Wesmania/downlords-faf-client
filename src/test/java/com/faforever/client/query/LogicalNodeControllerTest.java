@@ -45,7 +45,7 @@ public class LogicalNodeControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.logicalNodeRoot));
+    assertThat(instance.getRoot(), is(instance.getLogicalNodeRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
@@ -60,7 +60,7 @@ public class LogicalNodeControllerTest extends AbstractPlainJavaFxTest {
   }
 
   private void testWithParams(LogicalNodeController.LogicalOperator operator, String property, Object value, String expected) {
-    instance.logicalOperatorField.setValue(operator);
+    instance.getLogicalOperatorField().setValue(operator);
 
     Condition condition = qBuilder.string(property).exists();
     when(specificationController.appendTo(any())).thenReturn(Optional.ofNullable(condition));

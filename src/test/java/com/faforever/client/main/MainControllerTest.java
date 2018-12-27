@@ -163,7 +163,7 @@ public class MainControllerTest extends AbstractPlainJavaFxTest {
   @Test
   public void testHideNotifications() throws Exception {
     Platform.runLater(() -> instance.new ToastDisplayer(transientNotificationsController).invalidated(mock(SimpleBooleanProperty.class)));
-    assertFalse(instance.transientNotificationsPopup.isShowing());
+    assertFalse(instance.getTransientNotificationsPopup().isShowing());
   }
 
   @Test
@@ -182,7 +182,7 @@ public class MainControllerTest extends AbstractPlainJavaFxTest {
    * are attached to a window.
    */
   private void attachToRoot() {
-    WaitForAsyncUtils.asyncFx(() -> getRoot().getChildren().add(instance.mainRoot));
+    WaitForAsyncUtils.asyncFx(() -> getRoot().getChildren().add(instance.getRoot()));
     WaitForAsyncUtils.waitForFxEvents();
   }
 
@@ -197,7 +197,7 @@ public class MainControllerTest extends AbstractPlainJavaFxTest {
     WaitForAsyncUtils.asyncFx(instance::onNotificationsButtonClicked);
     WaitForAsyncUtils.waitForFxEvents();
 
-    assertThat(instance.persistentNotificationsPopup.isShowing(), is(true));
+    assertThat(instance.getPersistentNotificationsPopup().isShowing(), is(true));
   }
 
   @Test
@@ -218,7 +218,7 @@ public class MainControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), CoreMatchers.is(instance.mainRoot));
+    assertThat(instance.getRoot(), CoreMatchers.is(instance.getRoot()));
     assertThat(instance.getRoot().getParent(), CoreMatchers.is(nullValue()));
   }
 
@@ -231,9 +231,9 @@ public class MainControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testOnChat() throws Exception {
-    instance.chatButton.pseudoClassStateChanged(HIGHLIGHTED, true);
-    instance.onChat(new ActionEvent(instance.chatButton, Event.NULL_SOURCE_TARGET));
-    assertThat(instance.chatButton.getPseudoClassStates().contains(HIGHLIGHTED), is(false));
+    instance.getChatButton().pseudoClassStateChanged(HIGHLIGHTED, true);
+    instance.onChat(new ActionEvent(instance.getChatButton(), Event.NULL_SOURCE_TARGET));
+    assertThat(instance.getChatButton().getPseudoClassStates().contains(HIGHLIGHTED), is(false));
 
   }
 

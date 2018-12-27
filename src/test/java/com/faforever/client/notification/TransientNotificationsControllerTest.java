@@ -45,33 +45,33 @@ public class TransientNotificationsControllerTest extends AbstractPlainJavaFxTes
   public void testToastPositionTopLeft() throws Exception {
     notificationPrefs.setToastPosition(ToastPosition.TOP_LEFT);
     instance.initialize();
-    assertThat(instance.transientNotificationsRoot.getAlignment(), is(Pos.TOP_LEFT));
+    assertThat(instance.getTransientNotificationsRoot().getAlignment(), is(Pos.TOP_LEFT));
   }
 
   @Test
   public void testToastPositionTopRight() throws Exception {
     notificationPrefs.setToastPosition(ToastPosition.TOP_RIGHT);
     instance.initialize();
-    assertThat(instance.transientNotificationsRoot.getAlignment(), is(Pos.TOP_RIGHT));
+    assertThat(instance.getTransientNotificationsRoot().getAlignment(), is(Pos.TOP_RIGHT));
   }
 
   @Test
   public void testToastPositionBottomRight() throws Exception {
     notificationPrefs.setToastPosition(ToastPosition.BOTTOM_RIGHT);
     instance.initialize();
-    assertThat(instance.transientNotificationsRoot.getAlignment(), is(Pos.BOTTOM_RIGHT));
+    assertThat(instance.getTransientNotificationsRoot().getAlignment(), is(Pos.BOTTOM_RIGHT));
   }
 
   @Test
   public void testToastPositionBottomLeft() throws Exception {
     notificationPrefs.setToastPosition(ToastPosition.BOTTOM_LEFT);
     instance.initialize();
-    assertThat(instance.transientNotificationsRoot.getAlignment(), is(Pos.BOTTOM_LEFT));
+    assertThat(instance.getTransientNotificationsRoot().getAlignment(), is(Pos.BOTTOM_LEFT));
   }
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.transientNotificationsRoot));
+    assertThat(instance.getRoot(), is(instance.getTransientNotificationsRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
@@ -87,7 +87,7 @@ public class TransientNotificationsControllerTest extends AbstractPlainJavaFxTes
     TransientNotification notification2 = new TransientNotification("title2", "text2");
     instance.addNotification(notification2);
 
-    assertThat(instance.transientNotificationsRoot.getChildren(), hasSize(2));
+    assertThat(instance.getTransientNotificationsRoot().getChildren(), hasSize(2));
     verify(controller).setNotification(notification1);
     verify(controller).setNotification(notification2);
   }

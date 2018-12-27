@@ -55,9 +55,9 @@ public class LoginControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testLoginButtonClicked() throws Exception {
-    instance.usernameInput.setText("JUnit");
-    instance.passwordInput.setText("password");
-    instance.autoLoginCheckBox.setSelected(true);
+    instance.getUsernameInput().setText("JUnit");
+    instance.getPasswordInput().setText("password");
+    instance.getAutoLoginCheckBox().setSelected(true);
 
     when(userService.login(anyString(), anyString(), anyBoolean())).thenReturn(CompletableFuture.completedFuture(null));
 

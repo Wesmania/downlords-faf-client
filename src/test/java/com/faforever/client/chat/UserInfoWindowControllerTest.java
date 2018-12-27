@@ -105,12 +105,12 @@ public class UserInfoWindowControllerTest extends AbstractPlainJavaFxTest {
     verify(achievementService).getPlayerAchievements(PLAYER_ID);
     verify(eventService).getPlayerEvents(PLAYER_ID);
 
-    assertThat(instance.mostRecentAchievementPane.isVisible(), is(false));
+    assertThat(instance.getMostRecentAchievementPane().isVisible(), is(false));
   }
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.userInfoRoot));
+    assertThat(instance.getRoot(), is(instance.getUserInfoRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
@@ -133,7 +133,7 @@ public class UserInfoWindowControllerTest extends AbstractPlainJavaFxTest {
     verify(achievementService).getPlayerAchievements(PLAYER_ID);
     verify(eventService).getPlayerEvents(PLAYER_ID);
 
-    assertThat(instance.mostRecentAchievementPane.isVisible(), is(true));
+    assertThat(instance.getMostRecentAchievementPane().isVisible(), is(true));
   }
 
   @Test

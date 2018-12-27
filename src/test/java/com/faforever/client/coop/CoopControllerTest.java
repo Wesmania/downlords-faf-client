@@ -83,7 +83,7 @@ public class CoopControllerTest extends AbstractPlainJavaFxTest {
 
     loadFxml("theme/play/coop/coop.fxml", clazz -> instance);
 
-    verify(webViewConfigurer).configureWebView(instance.descriptionWebView);
+    verify(webViewConfigurer).configureWebView(instance.getDescriptionWebView());
   }
 
   @Test
@@ -103,7 +103,7 @@ public class CoopControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.coopRoot));
+    assertThat(instance.getRoot(), is(instance.getRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 }

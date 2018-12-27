@@ -50,7 +50,7 @@ public class SpecificationControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void testGetRoot() throws Exception {
-    assertThat(instance.getRoot(), is(instance.specificationRoot));
+    assertThat(instance.getRoot(), is(instance.getSpecificationRoot()));
     assertThat(instance.getRoot().getParent(), is(nullValue()));
   }
 
@@ -61,7 +61,7 @@ public class SpecificationControllerTest extends AbstractPlainJavaFxTest {
         "startTime", "i18n.startTime"
     ));
 
-    assertThat(instance.propertyField.getItems(), hasItems("name", "startTime"));
+    assertThat(instance.getPropertyField().getItems(), hasItems("name", "startTime"));
   }
 
   @Test
@@ -71,15 +71,15 @@ public class SpecificationControllerTest extends AbstractPlainJavaFxTest {
 
   @Test
   public void dontBuildIfComparisonOperatorIsNull() throws Exception {
-    instance.propertyField.setValue("Something");
+    instance.getPropertyField().setValue("Something");
     assertThat(instance.appendTo(qBuilder), is(Optional.empty()));
   }
 
   @Test
   public void dontBuildIfValueIsNull() throws Exception {
-    instance.operationField.setItems(FXCollections.observableArrayList(ComparisonOperator.EQ));
-    instance.operationField.getSelectionModel().select(0);
-    instance.propertyField.setValue("Something");
+    instance.getOperationField().setItems(FXCollections.observableArrayList(ComparisonOperator.EQ));
+    instance.getOperationField().getSelectionModel().select(0);
+    instance.getPropertyField().setValue("Something");
     assertThat(instance.appendTo(qBuilder), is(Optional.empty()));
   }
 
@@ -241,10 +241,10 @@ public class SpecificationControllerTest extends AbstractPlainJavaFxTest {
 
   private void testWithParams(ComparisonOperator comparisonOperator, String property, Object value, String expected) {
     instance.setRootType(Game.class);
-    instance.operationField.setItems(FXCollections.observableArrayList(comparisonOperator));
-    instance.operationField.getSelectionModel().select(0);
-    instance.propertyField.setValue(property);
-    instance.valueField.setValue(value);
+    instance.getOperationField().setItems(FXCollections.observableArrayList(comparisonOperator));
+    instance.getOperationField().getSelectionModel().select(0);
+    instance.getPropertyField().setValue(property);
+    instance.getValueField().setValue(value);
 
     Optional<Condition> optional = instance.appendTo(qBuilder);
     assertThat(optional.isPresent(), is(true));
@@ -256,10 +256,10 @@ public class SpecificationControllerTest extends AbstractPlainJavaFxTest {
 
   private void testInstantWithParams(ComparisonOperator comparisonOperator, String property, LocalDate value, String expected) {
     instance.setRootType(Game.class);
-    instance.operationField.setItems(FXCollections.observableArrayList(comparisonOperator));
-    instance.operationField.getSelectionModel().select(0);
-    instance.propertyField.setValue(property);
-    instance.datePicker.setValue(value);
+    instance.getOperationField().setItems(FXCollections.observableArrayList(comparisonOperator));
+    instance.getOperationField().getSelectionModel().select(0);
+    instance.getPropertyField().setValue(property);
+    instance.getDatePicker().setValue(value);
 
     Optional<Condition> optional = instance.appendTo(qBuilder);
     assertThat(optional.isPresent(), is(true));

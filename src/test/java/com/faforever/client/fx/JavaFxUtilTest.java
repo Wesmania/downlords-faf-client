@@ -22,8 +22,8 @@ public class JavaFxUtilTest {
   public void testPathToStringConverter() throws Exception {
     Path path = Paths.get(".");
 
-    Path fromString = PATH_STRING_CONVERTER.fromString(path.toString());
-    String toString = PATH_STRING_CONVERTER.toString(path);
+    Path fromString = Companion.getPATH_STRING_CONVERTER().fromString(path.toString());
+    String toString = Companion.getPATH_STRING_CONVERTER().toString(path);
 
     Assert.assertThat(fromString, is(path));
     Assert.assertThat(toString, is(path.toAbsolutePath().toString()));
@@ -31,8 +31,8 @@ public class JavaFxUtilTest {
 
   @Test
   public void testPathToStringConverterNull() throws Exception {
-    assertThat(PATH_STRING_CONVERTER.fromString(null), is(nullValue()));
-    assertThat(PATH_STRING_CONVERTER.toString(null), is(nullValue()));
+    assertThat(Companion.getPATH_STRING_CONVERTER().fromString(null), is(nullValue()));
+    assertThat(Companion.getPATH_STRING_CONVERTER().toString(null), is(nullValue()));
   }
 
   @Test
@@ -42,12 +42,12 @@ public class JavaFxUtilTest {
 
   @Test
   public void testFixTooltipDuration() throws Exception {
-    JavaFxUtil.fixTooltipDuration();
+    JavaFxUtil.Companion.fixTooltipDuration();
     // Smoke test, no assertions
   }
 
   @Test
   public void testToRgbCode() throws Exception {
-    assertThat(JavaFxUtil.toRgbCode(Color.AZURE), is("#F0FFFF"));
+    assertThat(JavaFxUtil.Companion.toRgbCode(Color.AZURE), is("#F0FFFF"));
   }
 }
