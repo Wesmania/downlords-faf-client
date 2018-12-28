@@ -28,38 +28,38 @@ import java.util.Optional
 import java.util.stream.Collectors
 
 class ModVersion {
-    private val displayName: StringProperty
-    private val imagePath: ObjectProperty<Path>
+    val displayName: StringProperty = SimpleStringProperty()
+    val imagePath: ObjectProperty<Path> = SimpleObjectProperty()
     /**
      * Entity ID as provided by the API (DB primary key).
      */
-    private val id: StringProperty
+    val id: StringProperty
     /**
      * UID as specified in the mod itself (specified by the uploader).
      */
-    private val uid: StringProperty
-    private val description: StringProperty
-    private val uploader: StringProperty
-    private val selectable: BooleanProperty
-    private val version: ObjectProperty<ComparableVersion>
-    private val thumbnailUrl: ObjectProperty<URL>
-    private val comments: ListProperty<String>
-    private val selected: BooleanProperty
-    private val likes: IntegerProperty
-    private val played: IntegerProperty
-    private val createTime: ObjectProperty<LocalDateTime>
-    private val updateTime: ObjectProperty<LocalDateTime>
-    private val downloadUrl: ObjectProperty<URL>
-    private val mountPoints: ListProperty<MountInfo>
-    private val hookDirectories: ListProperty<String>
-    private val reviews: ListProperty<Review>
-    private val reviewsSummary: ObjectProperty<ReviewsSummary>
-    private val modType: ObjectProperty<ModType>
-    private val filename: StringProperty
-    private val icon: StringProperty
-    private val ranked: BooleanProperty
-    private val hidden: BooleanProperty
-    private val mod: ObjectProperty<Mod>
+    val uid: StringProperty = SimpleStringProperty()
+    val description: StringProperty = SimpleStringProperty()
+    val uploader: StringProperty = SimpleStringProperty()
+    val selectable: BooleanProperty = SimpleBooleanProperty()
+    val version: ObjectProperty<ComparableVersion> = SimpleObjectProperty()
+    val thumbnailUrl: ObjectProperty<URL> = SimpleObjectProperty()
+    val comments: ListProperty<String>
+    val selected: BooleanProperty = SimpleBooleanProperty()
+    val likes: IntegerProperty
+    val played: IntegerProperty
+    val createTime: ObjectProperty<LocalDateTime> = SimpleObjectProperty()
+    val updateTime: ObjectProperty<LocalDateTime> = SimpleObjectProperty()
+    val downloadUrl: ObjectProperty<URL> = SimpleObjectProperty()
+    val mountPoints: ListProperty<MountInfo>
+    val hookDirectories: ListProperty<String>
+    val reviews: ListProperty<Review>
+    val reviewsSummary: ObjectProperty<ReviewsSummary> = SimpleObjectProperty()
+    val modType: ObjectProperty<ModType> = SimpleObjectProperty()
+    val filename: StringProperty = SimpleStringProperty()
+    val icon: StringProperty = SimpleStringProperty()
+    val ranked: BooleanProperty = SimpleBooleanProperty()
+    val hidden: BooleanProperty = SimpleBooleanProperty()
+    val mod: ObjectProperty<Mod> = SimpleObjectProperty()
 
     val mountInfos: ObservableList<MountInfo>
         get() = mountPoints.get()
@@ -76,12 +76,7 @@ class ModVersion {
         displayName = SimpleStringProperty()
         imagePath = SimpleObjectProperty()
         id = SimpleStringProperty()
-        uid = SimpleStringProperty()
-        description = SimpleStringProperty()
-        uploader = SimpleStringProperty()
-        selectable = SimpleBooleanProperty()
         version = SimpleObjectProperty()
-        selected = SimpleBooleanProperty()
         likes = SimpleIntegerProperty()
         played = SimpleIntegerProperty()
         createTime = SimpleObjectProperty()
@@ -94,10 +89,6 @@ class ModVersion {
         hookDirectories = SimpleListProperty(FXCollections.observableArrayList())
         reviews = SimpleListProperty(FXCollections.observableArrayList { param -> arrayOf(param.scoreProperty(), param.textProperty()) })
         modType = SimpleObjectProperty()
-        filename = SimpleStringProperty()
-        icon = SimpleStringProperty()
-        ranked = SimpleBooleanProperty()
-        hidden = SimpleBooleanProperty()
         mod = SimpleObjectProperty()
     }
 

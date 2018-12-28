@@ -1,8 +1,6 @@
 package com.faforever.client.player
 
-import com.faforever.client.chat.ChatChannelUser
 import com.faforever.client.chat.ChatUserCreatedEvent
-import com.faforever.client.chat.avatar.AvatarBean
 import com.faforever.client.chat.avatar.event.AvatarChangedEvent
 import com.faforever.client.chat.event.ChatMessageEvent
 import com.faforever.client.fx.JavaFxUtil
@@ -22,7 +20,6 @@ import com.google.common.eventbus.EventBus
 import com.google.common.eventbus.Subscribe
 import javafx.application.Platform
 import javafx.beans.property.ObjectProperty
-import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableMap
@@ -41,7 +38,6 @@ import com.faforever.client.player.SocialStatus.FOE
 import com.faforever.client.player.SocialStatus.FRIEND
 import com.faforever.client.player.SocialStatus.OTHER
 import com.faforever.client.player.SocialStatus.SELF
-import com.faforever.client.util.PropertyDelegate
 
 @Service
 class PlayerService(private val fafService: FafService, private val userService: UserService, private val eventBus: EventBus) {

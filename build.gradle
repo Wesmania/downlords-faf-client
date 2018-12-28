@@ -323,6 +323,7 @@ dependencies {
   compile("org.openjfx:javafx-fxml:${javafxVersion}:${javafxPlatform}")
   compile("org.openjfx:javafx-web:${javafxVersion}:${javafxPlatform}")
   compile("org.openjfx:javafx-media:${javafxVersion}:${javafxPlatform}")
+  compile('no.tornado:tornadofx:1.7.17')
 
   compile project(":webview-patch")
   compile("org.javassist:javassist:${project.ext['javassist.version']}")

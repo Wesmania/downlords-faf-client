@@ -20,11 +20,10 @@ import javafx.collections.ObservableSet
 import java.time.Instant
 import java.util.Objects
 import java.util.Optional
+import tornadofx.getValue
+import tornadofx.setValue
 
 import com.faforever.client.player.SocialStatus.OTHER
-import com.faforever.client.util.FloatDelegate
-import com.faforever.client.util.IntDelegate
-import com.faforever.client.util.PropertyDelegate
 import java.util.concurrent.Callable
 
 /**
@@ -33,37 +32,37 @@ import java.util.concurrent.Callable
 class Player private constructor() {
 
     val idProperty: IntegerProperty = SimpleIntegerProperty()
-    var id: Int by IntDelegate(idProperty)
+    var id: Int by idProperty
 
     val usernameProperty: StringProperty = SimpleStringProperty()
-    var username: String by PropertyDelegate(usernameProperty)
+    var username: String by usernameProperty
 
     val clanProperty: StringProperty = SimpleStringProperty()
-    var clan: String by PropertyDelegate(clanProperty)
+    var clan: String by clanProperty
 
     val countryProperty: StringProperty = SimpleStringProperty()
-    var country: String by PropertyDelegate(countryProperty)
+    var country: String by countryProperty
 
     val avatarUrlProperty: StringProperty = SimpleStringProperty()
-    var avatarUrl: String by PropertyDelegate(avatarUrlProperty)
+    var avatarUrl: String by avatarUrlProperty
 
     val avatarTooltipProperty: StringProperty = SimpleStringProperty()
-    var avatarTooltip: String by PropertyDelegate(avatarTooltipProperty)
+    var avatarTooltip: String by avatarTooltipProperty
 
     val socialStatusProperty: ObjectProperty<SocialStatus> = SimpleObjectProperty(OTHER)
-    var socialStatus: SocialStatus by PropertyDelegate(socialStatusProperty)
+    var socialStatus: SocialStatus by socialStatusProperty
 
     val globalRatingDeviationProperty: FloatProperty = SimpleFloatProperty()
-    var globalRatingDeviation: Float by FloatDelegate(globalRatingDeviationProperty)
+    var globalRatingDeviation: Float by globalRatingDeviationProperty
 
     val globalRatingMeanProperty: FloatProperty = SimpleFloatProperty()
-    var globalRatingMean: Float by FloatDelegate(globalRatingDeviationProperty)
+    var globalRatingMean: Float by globalRatingDeviationProperty
 
     val leaderboardRatingDeviationProperty: FloatProperty = SimpleFloatProperty()
-    var leaderboardRatingDeviation: Float by FloatDelegate(leaderboardRatingDeviationProperty)
+    var leaderboardRatingDeviation: Float by leaderboardRatingDeviationProperty
 
     val leaderboardRatingMeanProperty: FloatProperty = SimpleFloatProperty()
-    var leaderboardRatingMean: Float by FloatDelegate(leaderboardRatingDeviationProperty)
+    var leaderboardRatingMean: Float by leaderboardRatingDeviationProperty
 
     val gameProperty: ObjectProperty<Game?> = SimpleObjectProperty()
     var game: Game?
@@ -93,10 +92,10 @@ class Player private constructor() {
         get() = statusProperty.get()
 
     val numberOfGamesProperty: IntegerProperty = SimpleIntegerProperty()
-    var numberOfGames: Int by IntDelegate(numberOfGamesProperty)
+    var numberOfGames: Int by numberOfGamesProperty
 
     val idleSinceProperty: ObjectProperty<Instant> = SimpleObjectProperty(Instant.now())
-    var idleSince: Instant by PropertyDelegate(idleSinceProperty)
+    var idleSince: Instant by idleSinceProperty
 
     val chatChannelUsers: ObservableSet<ChatChannelUser> = FXCollections.observableSet()
     val names: ObservableList<NameRecord> = FXCollections.observableArrayList()

@@ -4,8 +4,6 @@ import com.faforever.client.fx.JavaFxUtil
 import com.faforever.client.remote.domain.GameInfoMessage
 import com.faforever.client.remote.domain.GameStatus
 import com.faforever.client.remote.domain.VictoryCondition
-import com.faforever.client.util.IntDelegate
-import com.faforever.client.util.PropertyDelegate
 import com.faforever.client.util.TimeUtil
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.IntegerProperty
@@ -18,90 +16,81 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
-import javafx.collections.ObservableMap
 import org.apache.commons.lang3.StringEscapeUtils
 import java.lang.RuntimeException
+import tornadofx.getValue
+import tornadofx.setValue
 
 import java.time.Instant
 import java.util.Optional
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.math.floor
-import kotlin.math.roundToLong
 
 class Game() {
 
     val idProperty: IntegerProperty = SimpleIntegerProperty()
-    var id: Int by IntDelegate(idProperty)
+    var id: Int by idProperty
 
     val hostProperty: StringProperty = SimpleStringProperty()
-    var host: String by PropertyDelegate(hostProperty)
+    var host: String by hostProperty
 
     val titleProperty: StringProperty = SimpleStringProperty()
-    var title: String by PropertyDelegate(titleProperty)
+    var title: String by titleProperty
 
     val mapFolderNameProperty: StringProperty = SimpleStringProperty()
-    var mapFolderName: String by PropertyDelegate(mapFolderNameProperty)
+    var mapFolderName: String by mapFolderNameProperty
 
     val featuredModProperty: StringProperty = SimpleStringProperty()
-    var featuredMod: String by PropertyDelegate(featuredModProperty)
+    var featuredMod: String by featuredModProperty
 
     val numPlayersProperty: IntegerProperty = SimpleIntegerProperty()
-    var numPlayers: Int by IntDelegate(numPlayersProperty)
+    var numPlayers: Int by numPlayersProperty
 
     val maxPlayersProperty: IntegerProperty = SimpleIntegerProperty()
-    var maxPlayers: Int by IntDelegate(maxPlayersProperty)
+    var maxPlayers: Int by maxPlayersProperty
 
     val minRatingProperty: IntegerProperty = SimpleIntegerProperty(0)
-    var minRating: Int?
-            get() = minRatingProperty.value
-            set(v) {
-                minRatingProperty.value = v
-            }
+    var minRating: Int? by minRatingProperty
 
     val maxRatingProperty: IntegerProperty = SimpleIntegerProperty(3000)
-    var maxRating: Int?
-        get() = maxRatingProperty.value
-        set(v) {
-            maxRatingProperty.value = v
-        }
+    var maxRating: Int? by minRatingProperty
 
     val passwordProtectedProperty: BooleanProperty = SimpleBooleanProperty()
-    val passwordProtected: Boolean by PropertyDelegate(passwordProtectedProperty)
+    val passwordProtected: Boolean by passwordProtectedProperty
 
     val passwordProperty: StringProperty = SimpleStringProperty()
-    var password: String by PropertyDelegate(passwordProperty)
+    var password: String by passwordProperty
 
     val visibilityProperty: ObjectProperty<GameVisibility> = SimpleObjectProperty()
-    val visibility: GameVisibility by PropertyDelegate(visibilityProperty)
+    val visibility: GameVisibility by visibilityProperty
 
     val statusProperty: ObjectProperty<GameStatus> = SimpleObjectProperty()
-    var status: GameStatus by PropertyDelegate(statusProperty)
+    var status: GameStatus by statusProperty
 
     val victoryConditionProperty: ObjectProperty<VictoryCondition> = SimpleObjectProperty()
-    var victoryCondition: VictoryCondition by PropertyDelegate(victoryConditionProperty)
+    var victoryCondition: VictoryCondition by victoryConditionProperty
 
     val startTimeProperty: ObjectProperty<Instant> = SimpleObjectProperty()
-    var startTime: Instant? by PropertyDelegate(startTimeProperty)
+    var startTime: Instant? by startTimeProperty
 
     /**
      * Maps a sim mod's UID to its name.
      */
     val simModsProperty: MapProperty<String, String> = SimpleMapProperty(FXCollections.observableHashMap())
-    var simMods by PropertyDelegate(simModsProperty)
+    var simMods by simModsProperty
 
     /**
      * Maps team names ("1", "2", ...) to a list of player names. **Make sure to synchronize on the return
      * value.**
      */
     val teamsProperty: MapProperty<String, List<String>> = SimpleMapProperty(FXCollections.observableHashMap())
-    var teams by PropertyDelegate(teamsProperty)
+    var teams by teamsProperty
 
     /**
      * Maps an index (1,2,3,4...) to a version number. Don't ask me what this index maps to.
      */
     val featuredModVersionsProperty: MapProperty<String, Int> = SimpleMapProperty(FXCollections.observableHashMap())
-    var featuredModVersions by PropertyDelegate(featuredModVersionsProperty)
+    var featuredModVersions by featuredModVersionsProperty
 
     constructor(gameInfoMessage: GameInfoMessage) : this() {
         /* FIXME - add separate type for full messages to get rid of runtime checking here */
