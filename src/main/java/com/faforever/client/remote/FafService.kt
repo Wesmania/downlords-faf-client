@@ -1,16 +1,7 @@
 package com.faforever.client.remote
 
 import com.faforever.client.api.FafApiAccessor
-import com.faforever.client.api.dto.AchievementDefinition
-import com.faforever.client.api.dto.CoopResult
-import com.faforever.client.api.dto.FeaturedModFile
-import com.faforever.client.api.dto.Game
-import com.faforever.client.api.dto.GamePlayerStats
-import com.faforever.client.api.dto.GameReview
-import com.faforever.client.api.dto.MapVersion
-import com.faforever.client.api.dto.MapVersionReview
-import com.faforever.client.api.dto.ModVersionReview
-import com.faforever.client.api.dto.PlayerAchievement
+import com.faforever.client.api.dto.*
 import com.faforever.client.chat.avatar.AvatarBean
 import com.faforever.client.chat.avatar.event.AvatarChangedEvent
 import com.faforever.client.clan.Clan
@@ -65,39 +56,39 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
     val mods: CompletableFuture<List<ModVersion>>
         @Async
         get() = CompletableFuture.completedFuture(fafApiAccessor.mods.stream()
-                .map<ModVersion>(Function<Mod, ModVersion> { ModVersion.fromModDto(it) })
-                .collect<List<ModVersion>, Any>(toList()))
+                .map { ModVersion.fromModDto(it) }
+                .collect(toList()))
 
     val coopMaps: CompletableFuture<List<CoopMission>>
         @Async
         get() = CompletableFuture.completedFuture(fafApiAccessor.coopMissions.stream()
-                .map<CoopMission>(Function<CoopMission, CoopMission> { CoopMission.fromCoopInfo(it) })
-                .collect<List<CoopMission>, Any>(toList()))
+                .map { CoopMission.fromCoopInfo(it) }
+                .collect(toList()))
 
     val availableAvatars: CompletableFuture<List<AvatarBean>>
         @Async
         get() = CompletableFuture.completedFuture(fafServerAccessor.availableAvatars.stream()
-                .map<AvatarBean>(Function<Avatar, AvatarBean> { AvatarBean.fromAvatar(it) })
-                .collect<List<AvatarBean>, Any>(Collectors.toList()))
+                .map { AvatarBean.fromAvatar(it) }
+                .collect(Collectors.toList()))
 
     val featuredMods: CompletableFuture<List<FeaturedMod>>
         @Async
         get() = CompletableFuture.completedFuture(fafApiAccessor.featuredMods.stream()
-                .sorted(Comparator.comparingInt(ToIntFunction<FeaturedMod> { getOrder() }))
-                .map<FeaturedMod>(Function<FeaturedMod, FeaturedMod> { FeaturedMod.fromFeaturedMod(it) })
-                .collect<List<FeaturedMod>, Any>(Collectors.toList()))
+                .sorted(compareBy { it.order })
+                .map { FeaturedMod.fromFeaturedMod(it) }
+                .collect(Collectors.toList()))
 
     val ladder1v1Leaderboard: CompletableFuture<List<LeaderboardEntry>>
         @Async
         get() = CompletableFuture.completedFuture(fafApiAccessor.ladder1v1Leaderboard.parallelStream()
-                .map<LeaderboardEntry>(Function<Ladder1v1LeaderboardEntry, LeaderboardEntry> { LeaderboardEntry.fromLadder1v1(it) })
-                .collect<List<LeaderboardEntry>, Any>(toList()))
+                .map { LeaderboardEntry.fromLadder1v1(it) }
+                .collect(toList()))
 
     val globalLeaderboard: CompletableFuture<List<LeaderboardEntry>>
         @Async
         get() = CompletableFuture.completedFuture(fafApiAccessor.globalLeaderboard.parallelStream()
-                .map<LeaderboardEntry>(Function<GlobalLeaderboardEntry, LeaderboardEntry> { LeaderboardEntry.fromGlobalRating(it) })
-                .collect<List<LeaderboardEntry>, Any>(toList()))
+                .map { LeaderboardEntry.fromGlobalRating(it) }
+                .collect(toList()))
 
     val achievementDefinitions: CompletableFuture<List<AchievementDefinition>>
         @Async
@@ -110,8 +101,8 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
         @Async
         get() = CompletableFuture.completedFuture(fafApiAccessor.allTournaments
                 .stream()
-                .map<TournamentBean>(Function<Tournament, TournamentBean> { TournamentBean.fromTournamentDto(it) })
-                .collect<List<TournamentBean>, Any>(toList()))
+                .map { TournamentBean.fromTournamentDto(it) }
+                .collect(toList()))
 
     fun <T : ServerMessage> addOnMessageListener(type: Class<T>, listener: Consumer<T>) {
         fafServerAccessor.addOnMessageListener(type, listener)
@@ -191,22 +182,22 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
     @Async
     fun getMostPlayedMaps(count: Int, page: Int): CompletableFuture<List<MapBean>> {
         return CompletableFuture.completedFuture(fafApiAccessor.getMostPlayedMaps(count, page).stream()
-                .map<MapBean>(Function<Map, MapBean> { MapBean.fromMapDto(it) })
-                .collect<List<MapBean>, Any>(toList()))
+                .map { MapBean.fromMapDto(it) }
+                .collect(toList()))
     }
 
     @Async
     fun getHighestRatedMaps(count: Int, page: Int): CompletableFuture<List<MapBean>> {
         return CompletableFuture.completedFuture(fafApiAccessor.getHighestRatedMaps(count, page).stream()
-                .map<MapBean>(Function<Map, MapBean> { MapBean.fromMapDto(it) })
-                .collect<List<MapBean>, Any>(toList()))
+                .map { MapBean.fromMapDto(it) }
+                .collect(toList()))
     }
 
     @Async
     fun getNewestMaps(count: Int, page: Int): CompletableFuture<List<MapBean>> {
         return CompletableFuture.completedFuture(fafApiAccessor.getNewestMaps(count, page).stream()
-                .map<MapBean>(Function<Map, MapBean> { MapBean.fromMapDto(it) })
-                .collect<List<MapBean>, Any>(toList()))
+                .map { MapBean.fromMapDto(it) }
+                .collect(toList()))
     }
 
     fun selectAvatar(avatar: AvatarBean?) {
@@ -229,35 +220,35 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
         return CompletableFuture.completedFuture(fafApiAccessor.getGamePlayerStats(playerId, knownFeaturedMod)
                 .parallelStream()
                 .filter { gamePlayerStats ->
-                    (gamePlayerStats.getScoreTime() != null
-                            && gamePlayerStats.getAfterMean() != null
-                            && gamePlayerStats.getAfterDeviation() != null)
+                    (gamePlayerStats.scoreTime != null
+                            && gamePlayerStats.afterMean != null
+                            && gamePlayerStats.afterDeviation != null)
                 }
-                .sorted(Comparator.comparing(Function<GamePlayerStats, Any> { getScoreTime() }))
-                .map { entry -> RatingHistoryDataPoint(entry.getScoreTime(), entry.getAfterMean(), entry.getAfterDeviation()) }
-                .collect<List<RatingHistoryDataPoint>, Any>(Collectors.toList())
+                .sorted(compareBy { it.scoreTime })
+                .map { entry -> RatingHistoryDataPoint(entry.scoreTime, entry.afterMean, entry.afterDeviation) }
+                .collect(Collectors.toList())
         )
     }
 
     @Async
     fun getFeaturedModFiles(featuredMod: FeaturedMod, version: Int?): CompletableFuture<List<FeaturedModFile>> {
-        return CompletableFuture.completedFuture(fafApiAccessor.getFeaturedModFiles(featuredMod, version!!))
+        return CompletableFuture.completedFuture(fafApiAccessor.getFeaturedModFiles(featuredMod, version))
     }
 
     @Async
     fun getNewestReplays(topElementCount: Int, page: Int): CompletableFuture<List<Replay>> {
         return CompletableFuture.completedFuture(fafApiAccessor.getNewestReplays(topElementCount, page)
                 .parallelStream()
-                .map<Replay>(Function<Game, Replay> { Replay.fromDto(it) })
-                .collect<List<Replay>, Any>(toList()))
+                .map { Replay.fromDto(it) }
+                .collect(toList()))
     }
 
     @Async
     fun getHighestRatedReplays(topElementCount: Int, page: Int): CompletableFuture<List<Replay>> {
         return CompletableFuture.completedFuture(fafApiAccessor.getHighestRatedReplays(topElementCount, page)
                 .parallelStream()
-                .map<Replay>(Function<Game, Replay> { Replay.fromDto(it) })
-                .collect<List<Replay>, Any>(toList()))
+                .map { Replay.fromDto(it) }
+                .collect(toList()))
     }
 
     fun uploadMod(modFile: Path, byteListener: ByteCountListener) {
@@ -278,27 +269,27 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
     fun findReplaysByQuery(query: String, maxResults: Int, page: Int, sortConfig: SortConfig): CompletableFuture<List<Replay>> {
         return CompletableFuture.completedFuture(fafApiAccessor.findReplaysByQuery(query, maxResults, page, sortConfig)
                 .parallelStream()
-                .map<Replay>(Function<Game, Replay> { Replay.fromDto(it) })
-                .collect<List<Replay>, Any>(toList()))
+                .map { Replay.fromDto(it) }
+                .collect(toList()))
     }
 
     @Async
     fun findMapsByQuery(query: SearchConfig, page: Int, count: Int): CompletableFuture<List<MapBean>> {
         return CompletableFuture.completedFuture(fafApiAccessor.findMapsByQuery(query, page, count)
                 .parallelStream()
-                .map<MapBean>(Function<Map, MapBean> { MapBean.fromMapDto(it) })
-                .collect<List<MapBean>, Any>(toList()))
+                .map { MapBean.fromMapDto(it) }
+                .collect(toList()))
     }
 
     fun findMapByFolderName(folderName: String): CompletableFuture<Optional<MapBean>> {
         return CompletableFuture.completedFuture(fafApiAccessor.findMapByFolderName(folderName)
-                .map(Function<MapVersion, MapBean> { MapBean.fromMapVersionDto(it) }))
+                .map { MapBean.fromMapVersionDto(it) })
     }
 
     fun getPlayersByIds(playerIds: Collection<Int>): CompletableFuture<List<Player>> {
         return CompletableFuture.completedFuture(fafApiAccessor.getPlayersByIds(playerIds).stream()
-                .map<Player>(Function<Player, Player> { Player.fromDto(it) })
-                .collect<List<Player>, Any>(toList()))
+                .map { Player.fromDto(it) }
+                .collect(toList()))
     }
 
     @Async
@@ -367,7 +358,7 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
     @Async
     fun getLastGameOnMap(playerId: Int, mapVersionId: String): CompletableFuture<Optional<Replay>> {
         return CompletableFuture.completedFuture(fafApiAccessor.getLastGamesOnMap(playerId, mapVersionId, 1).stream()
-                .map<Replay>(Function<Game, Replay> { Replay.fromDto(it) })
+                .map { Replay.fromDto(it) }
                 .findFirst())
     }
 
@@ -391,7 +382,7 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
 
     fun findReplayById(id: Int): CompletableFuture<Optional<Replay>> {
         return CompletableFuture.completedFuture(fafApiAccessor.findReplayById(id)
-                .map(Function<Game, Replay> { Replay.fromDto(it) }))
+                .map { Replay.fromDto(it) })
     }
 
     fun restoreGameSession(id: Int) {
@@ -402,27 +393,27 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
     fun findModsByQuery(query: SearchConfig, page: Int, count: Int): CompletableFuture<List<ModVersion>> {
         return CompletableFuture.completedFuture(fafApiAccessor.findModsByQuery(query, page, count)
                 .parallelStream()
-                .map<ModVersion>(Function<Mod, ModVersion> { ModVersion.fromModDto(it) })
-                .collect<List<ModVersion>, Any>(toList()))
+                .map { ModVersion.fromModDto(it) }
+                .collect(toList()))
     }
 
     @Async
     fun getLadder1v1Maps(count: Int, page: Int): CompletableFuture<List<MapBean>> {
         val maps = fafApiAccessor.getLadder1v1Maps(count, page).stream()
-                .map { ladder1v1Map -> MapBean.fromMapVersionDto(ladder1v1Map.getMapVersion()) }
-                .collect<List<MapBean>, Any>(toList())
+                .map { ladder1v1Map -> MapBean.fromMapVersionDto(ladder1v1Map.mapVersion) }
+                .collect(toList())
         return CompletableFuture.completedFuture(maps)
     }
 
     @Async
     fun getClanByTag(tag: String): CompletableFuture<Optional<Clan>> {
         return CompletableFuture.completedFuture(fafApiAccessor.getClanByTag(tag)
-                .map(Function<Clan, Clan> { Clan.fromDto(it) }))
+                .map { Clan.fromDto(it) })
     }
 
     fun findMapById(id: String): Optional<MapBean> {
         return fafApiAccessor.findMapVersionById(id)
-                .map(Function<MapVersion, MapBean> { MapBean.fromMapVersionDto(it) })
+                .map { MapBean.fromMapVersionDto(it) }
     }
 
     fun sendIceMessage(remotePlayerId: Int, message: Any) {
@@ -433,15 +424,15 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
     @Async
     fun getOwnedMaps(playerId: Int, loadMoreCount: Int, page: Int): CompletableFuture<List<MapBean>> {
         val maps = fafApiAccessor.getOwnedMaps(playerId, loadMoreCount, page)
-        return CompletableFuture.completedFuture(maps.stream().map<MapBean>(Function<MapVersion, MapBean> { MapBean.fromMapVersionDto(it) }).collect<List<MapBean>, Any>(toList()))
+        return CompletableFuture.completedFuture(maps.stream().map { MapBean.fromMapVersionDto(it) }.collect(toList()))
     }
 
     @Async
     fun hideMapVersion(map: MapBean): CompletableFuture<Void> {
         val id = map.id
         val mapVersion = MapVersion()
-        mapVersion.setHidden(true)
-        mapVersion.setId(map.id)
+        mapVersion.hidden = true
+        mapVersion.id = map.id
         fafApiAccessor.updateMapVersion(id, mapVersion)
         return CompletableFuture.completedFuture(null)
     }
@@ -450,8 +441,8 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
     fun unrankeMapVersion(map: MapBean): CompletableFuture<Void> {
         val id = map.id
         val mapVersion = MapVersion()
-        mapVersion.setRanked(false)
-        mapVersion.setId(map.id)
+        mapVersion.ranked = false
+        mapVersion.id = map.id
         fafApiAccessor.updateMapVersion(id, mapVersion)
         return CompletableFuture.completedFuture(null)
     }

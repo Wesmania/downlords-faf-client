@@ -1,7 +1,5 @@
 package com.faforever.client.player
 
-import com.faforever.client.api.dto.GlobalRating
-import com.faforever.client.api.dto.Ladder1v1Rating
 import com.faforever.client.chat.ChatChannelUser
 import com.faforever.client.game.Game
 import com.faforever.client.game.PlayerStatus
@@ -23,288 +21,130 @@ import javafx.collections.ObservableSet
 import java.time.Instant
 import java.util.Objects
 import java.util.Optional
-import java.util.stream.Collectors
 
 import com.faforever.client.player.SocialStatus.OTHER
+import com.faforever.client.util.FloatDelegate
+import com.faforever.client.util.IntDelegate
+import com.faforever.client.util.PropertyDelegate
+import java.util.concurrent.Callable
 
 /**
  * Represents a player with username, clan, country, friend/foe flag and so on.
  */
 class Player private constructor() {
 
-    private val id: IntegerProperty
-    private val username: StringProperty
-    private val clan: StringProperty
-    private val country: StringProperty
-    private val avatarUrl: StringProperty
-    private val avatarTooltip: StringProperty
-    private val socialStatus: ObjectProperty<SocialStatus>
-    private val globalRatingDeviation: FloatProperty
-    private val globalRatingMean: FloatProperty
-    private val leaderboardRatingDeviation: FloatProperty
-    private val leaderboardRatingMean: FloatProperty
-    private val game: ObjectProperty<Game>
-    private val status: ObjectProperty<PlayerStatus>
-    val chatChannelUsers: ObservableSet<ChatChannelUser>
-    private val numberOfGames: IntegerProperty
-    private val idleSince: ObjectProperty<Instant>
-    val names: ObservableList<NameRecord>
+    val idProperty: IntegerProperty = SimpleIntegerProperty()
+    var id: Int by IntDelegate(idProperty)
+
+    val usernameProperty: StringProperty = SimpleStringProperty()
+    var username: String by PropertyDelegate(usernameProperty)
+
+    val clanProperty: StringProperty = SimpleStringProperty()
+    var clan: String by PropertyDelegate(clanProperty)
+
+    val countryProperty: StringProperty = SimpleStringProperty()
+    var country: String by PropertyDelegate(countryProperty)
+
+    val avatarUrlProperty: StringProperty = SimpleStringProperty()
+    var avatarUrl: String by PropertyDelegate(avatarUrlProperty)
+
+    val avatarTooltipProperty: StringProperty = SimpleStringProperty()
+    var avatarTooltip: String by PropertyDelegate(avatarTooltipProperty)
+
+    val socialStatusProperty: ObjectProperty<SocialStatus> = SimpleObjectProperty(OTHER)
+    var socialStatus: SocialStatus by PropertyDelegate(socialStatusProperty)
+
+    val globalRatingDeviationProperty: FloatProperty = SimpleFloatProperty()
+    var globalRatingDeviation: Float by FloatDelegate(globalRatingDeviationProperty)
+
+    val globalRatingMeanProperty: FloatProperty = SimpleFloatProperty()
+    var globalRatingMean: Float by FloatDelegate(globalRatingDeviationProperty)
+
+    val leaderboardRatingDeviationProperty: FloatProperty = SimpleFloatProperty()
+    var leaderboardRatingDeviation: Float by FloatDelegate(leaderboardRatingDeviationProperty)
+
+    val leaderboardRatingMeanProperty: FloatProperty = SimpleFloatProperty()
+    var leaderboardRatingMean: Float by FloatDelegate(leaderboardRatingDeviationProperty)
+
+    val gameProperty: ObjectProperty<Game?> = SimpleObjectProperty()
+    var game: Game?
+        get() = gameProperty.get()
+        set(game: Game?) {
+            this.gameProperty.set(game)
+            if (game == null) {
+                status.unbind()
+                status.set(PlayerStatus.IDLE)
+            } else {
+                this.statusProperty.bind(Bindings.createObjectBinding(Callable<PlayerStatus> {
+                    if (game.status == GameStatus.OPEN) {
+                        if (game.host.equals(username, ignoreCase = true)) {
+                            return@Callable PlayerStatus.HOSTING
+                        }
+                        return@Callable PlayerStatus.LOBBYING
+                    } else if (game.status == GameStatus.CLOSED) {
+                        return@Callable PlayerStatus.IDLE
+                    }
+                    PlayerStatus.PLAYING
+                }, game.statusProperty()))
+            }
+        }
+
+    val statusProperty: ObjectProperty<PlayerStatus> = SimpleObjectProperty(PlayerStatus.IDLE)
+    val status: PlayerStatus
+        get() = statusProperty.get()
+
+    val numberOfGamesProperty: IntegerProperty = SimpleIntegerProperty()
+    var numberOfGames: Int by IntDelegate(numberOfGamesProperty)
+
+    val idleSinceProperty: ObjectProperty<Instant> = SimpleObjectProperty(Instant.now())
+    var idleSince: Instant by PropertyDelegate(idleSinceProperty)
+
+    val chatChannelUsers: ObservableSet<ChatChannelUser> = FXCollections.observableSet()
+    val names: ObservableList<NameRecord> = FXCollections.observableArrayList()
 
     constructor(player: com.faforever.client.remote.domain.Player) : this() {
 
-        username.set(player.login)
-        clan.set(player.clan)
-        country.set(player.country)
+        username = player.login
+        clan = player.clan
+        country = player.country
 
         if (player.avatar != null) {
-            avatarTooltip.set(player.avatar!!.tooltip)
-            avatarUrl.set(player.avatar!!.url)
+            avatarTooltip = player.avatar!!.tooltip
+            avatarUrl = player.avatar!!.url
         }
     }
 
-    init {
-        id = SimpleIntegerProperty()
-        username = SimpleStringProperty()
-        clan = SimpleStringProperty()
-        country = SimpleStringProperty()
-        avatarUrl = SimpleStringProperty()
-        avatarTooltip = SimpleStringProperty()
-        globalRatingDeviation = SimpleFloatProperty()
-        globalRatingMean = SimpleFloatProperty()
-        leaderboardRatingDeviation = SimpleFloatProperty()
-        leaderboardRatingMean = SimpleFloatProperty()
-        status = SimpleObjectProperty(PlayerStatus.IDLE)
-        chatChannelUsers = FXCollections.observableSet()
-        game = SimpleObjectProperty()
-        numberOfGames = SimpleIntegerProperty()
-        socialStatus = SimpleObjectProperty(OTHER)
-        idleSince = SimpleObjectProperty(Instant.now())
-        names = FXCollections.observableArrayList()
-    }
-
     constructor(username: String) : this() {
-        this.username.set(username)
-    }
-
-    fun getSocialStatus(): SocialStatus {
-        return socialStatus.get()
-    }
-
-    fun setSocialStatus(socialStatus: SocialStatus) {
-        this.socialStatus.set(socialStatus)
-    }
-
-    fun socialStatusProperty(): ObjectProperty<SocialStatus> {
-        return socialStatus
-    }
-
-    fun getId(): Int {
-        return id.get()
-    }
-
-    fun setId(id: Int) {
-        this.id.set(id)
-    }
-
-    fun idProperty(): IntegerProperty {
-        return id
-    }
-
-    fun getNumberOfGames(): Int {
-        return numberOfGames.get()
-    }
-
-    fun setNumberOfGames(numberOfGames: Int) {
-        this.numberOfGames.set(numberOfGames)
-    }
-
-    fun numberOfGamesProperty(): IntegerProperty {
-        return numberOfGames
+        this.username = username
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(id.get(), username.get())
+        return Objects.hash(id, username)
     }
 
     override fun equals(obj: Any?): Boolean {
         return (obj != null
                 && obj.javaClass == Player::class.java
-                && (getId() == (obj as Player).getId() && getId() != 0 || getUsername().equals(obj.getUsername(), ignoreCase = true)))
-    }
-
-    fun getUsername(): String {
-        return username.get()
-    }
-
-    fun setUsername(username: String) {
-        this.username.set(username)
-    }
-
-    fun usernameProperty(): StringProperty {
-        return username
-    }
-
-    fun getClan(): String {
-        return clan.get()
-    }
-
-    fun setClan(clan: String?) {
-        this.clan.set(clan)
-    }
-
-    fun clanProperty(): StringProperty {
-        return clan
-    }
-
-    fun getCountry(): String {
-        return country.get()
-    }
-
-    fun setCountry(country: String?) {
-        this.country.set(country)
-    }
-
-    fun countryProperty(): StringProperty {
-        return country
-    }
-
-    fun getAvatarUrl(): String {
-        return avatarUrl.get()
-    }
-
-    fun setAvatarUrl(avatarUrl: String?) {
-        this.avatarUrl.set(avatarUrl)
-    }
-
-    fun avatarUrlProperty(): StringProperty {
-        return avatarUrl
-    }
-
-    fun getAvatarTooltip(): String {
-        return avatarTooltip.get()
-    }
-
-    fun setAvatarTooltip(avatarTooltip: String?) {
-        this.avatarTooltip.set(avatarTooltip)
-    }
-
-    fun avatarTooltipProperty(): StringProperty {
-        return avatarTooltip
-    }
-
-    fun getGlobalRatingDeviation(): Float {
-        return globalRatingDeviation.get()
-    }
-
-    fun setGlobalRatingDeviation(globalRatingDeviation: Float) {
-        this.globalRatingDeviation.set(globalRatingDeviation)
-    }
-
-    fun globalRatingDeviationProperty(): FloatProperty {
-        return globalRatingDeviation
-    }
-
-    fun getGlobalRatingMean(): Float {
-        return globalRatingMean.get()
-    }
-
-    fun setGlobalRatingMean(globalRatingMean: Float) {
-        this.globalRatingMean.set(globalRatingMean)
-    }
-
-    fun globalRatingMeanProperty(): FloatProperty {
-        return globalRatingMean
-    }
-
-    fun getStatus(): PlayerStatus {
-        return status.get()
-    }
-
-    fun statusProperty(): ReadOnlyObjectProperty<PlayerStatus> {
-        return status
-    }
-
-    fun getGame(): Game {
-        return game.get()
-    }
-
-    fun setGame(game: Game?) {
-        this.game.set(game)
-        if (game == null) {
-            status.unbind()
-            status.set(PlayerStatus.IDLE)
-        } else {
-            this.status.bind(Bindings.createObjectBinding({
-                if (getGame().status == GameStatus.OPEN) {
-                    if (getGame().host.equals(username.get(), ignoreCase = true)) {
-                        return@Bindings.createObjectBinding PlayerStatus . HOSTING
-                    }
-                    return@Bindings.createObjectBinding PlayerStatus . LOBBYING
-                } else if (getGame().status == GameStatus.CLOSED) {
-                    return@Bindings.createObjectBinding PlayerStatus . IDLE
-                }
-                PlayerStatus.PLAYING
-            }, game.statusProperty()))
-        }
-    }
-
-    fun gameProperty(): ObjectProperty<Game> {
-        return game
-    }
-
-    fun getLeaderboardRatingMean(): Float {
-        return leaderboardRatingMean.get()
-    }
-
-    fun setLeaderboardRatingMean(leaderboardRatingMean: Float) {
-        this.leaderboardRatingMean.set(leaderboardRatingMean)
-    }
-
-    fun leaderboardRatingMeanProperty(): FloatProperty {
-        return leaderboardRatingMean
-    }
-
-    fun getLeaderboardRatingDeviation(): Float {
-        return leaderboardRatingDeviation.get()
-    }
-
-    fun setLeaderboardRatingDeviation(leaderboardRatingDeviation: Float) {
-        this.leaderboardRatingDeviation.set(leaderboardRatingDeviation)
-    }
-
-    fun getIdleSince(): Instant {
-        return idleSince.get()
-    }
-
-    fun setIdleSince(idleSince: Instant) {
-        this.idleSince.set(idleSince)
-    }
-
-    fun idleSinceProperty(): ObjectProperty<Instant> {
-        return idleSince
-    }
-
-    fun leaderboardRatingDeviationProperty(): FloatProperty {
-        return leaderboardRatingDeviation
+                && (id == (obj as Player).id && id != 0 || username.equals(obj.username, ignoreCase = true)))
     }
 
     fun updateFromDto(player: com.faforever.client.remote.domain.Player) {
-        setId(player.id)
-        setClan(player.clan)
-        setCountry(player.country)
+        id = player.id
+        clan = player.clan
+        country = player.country
 
         if (player.globalRating != null) {
-            setGlobalRatingMean(player.globalRating!![0])
-            setGlobalRatingDeviation(player.globalRating!![1])
+            globalRatingMean = player.globalRating!![0]
+            globalRatingDeviation = player.globalRating!![1]
         }
         if (player.ladderRating != null) {
-            setLeaderboardRatingMean(player.ladderRating!![0])
-            setLeaderboardRatingDeviation(player.ladderRating!![1])
+            leaderboardRatingMean = player.ladderRating!![0]
+            leaderboardRatingDeviation = player.ladderRating!![1]
         }
-        setNumberOfGames(player.numberOfGames!!)
+        numberOfGames = player.numberOfGames
         if (player.avatar != null) {
-            setAvatarUrl(player.avatar!!.url)
-            setAvatarTooltip(player.avatar!!.tooltip)
+            avatarUrl = player.avatar!!.url
+            avatarTooltip = player.avatar!!.tooltip
         }
     }
 
@@ -312,12 +152,12 @@ class Player private constructor() {
 
         fun fromDto(dto: com.faforever.client.api.dto.Player): Player {
             val player = Player(dto.getLogin())
-            player.setId(Integer.parseInt(dto.getId()))
-            player.setUsername(dto.getLogin())
-            player.setGlobalRatingMean(Optional.ofNullable(dto.getGlobalRating()).map(Function<T, Any> { getMean() }).orElse(0.0).floatValue())
-            player.setGlobalRatingDeviation(Optional.ofNullable(dto.getGlobalRating()).map(Function<T, Any> { getDeviation() }).orElse(0.0).floatValue())
-            player.setLeaderboardRatingMean(Optional.ofNullable(dto.getLadder1v1Rating()).map(Function<T, Any> { getMean() }).orElse(0.0).floatValue())
-            player.setLeaderboardRatingDeviation(Optional.ofNullable(dto.getLadder1v1Rating()).map(Function<T, Any> { getDeviation() }).orElse(0.0).floatValue())
+            player.id = Integer.parseInt(dto.getId())
+            player.username = dto.getLogin()
+            player.globalRatingMean = Optional.ofNullable(dto.getGlobalRating()).map(Function<T, Any> { getMean() }).orElse(0.0).floatValue()
+            player.globalRatingDeviation = Optional.ofNullable(dto.getGlobalRating()).map(Function<T, Any> { getDeviation() }).orElse(0.0).floatValue()
+            player.leaderboardRatingMean = Optional.ofNullable(dto.getLadder1v1Rating()).map(Function<T, Any> { getMean() }).orElse(0.0).floatValue()
+            player.leaderboardRatingDeviation = Optional.ofNullable(dto.getLadder1v1Rating()).map(Function<T, Any> { getDeviation() }).orElse(0.0).floatValue()
             if (dto.getNames() != null) {
                 player.names.addAll(dto.getNames().stream().map(???({ NameRecord.fromDto(it) })).collect(Collectors.toList<T>()))
             }
