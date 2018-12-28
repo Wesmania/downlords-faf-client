@@ -1,33 +1,26 @@
 package com.faforever.client.remote.domain
 
-import lombok.Getter
-import lombok.Setter
-
-@Getter
-@Setter
-class GameInfoMessage : FafServerMessage(FafServerMessageType.GAME_INFO) {
-
-    private val host: String? = null
-    private val passwordProtected: Boolean? = null
+class GameInfoMessage(val uid: Int): FafServerMessage(FafServerMessageType.GAME_INFO) {
+    val host: String? = null
+    val passwordProtected: Boolean? = null
     // TODO use enum
-    private val visibility: String? = null
-    private val state: GameStatus? = null
-    private val numPlayers: Int? = null
-    private val teams: Map<String, List<String>>? = null
-    private val featuredModVersions: Map<String, Int>? = null
-    private val featuredMod: String? = null
-    private val uid: Int? = null
-    private val maxPlayers: Int? = null
-    private val title: String? = null
+    val visibility: String? = null
+    val state: GameStatus? = null
+    val numPlayers: Int? = null
+    val teams: Map<String, List<String>>? = null
+    val featuredModVersions: Map<String, Int>? = null
+    val featuredMod: String? = null
+    val maxPlayers: Int? = null
+    val title: String? = null
     // FAF calls this "game_type" but it's actually the victory condition.
-    private val gameType: VictoryCondition? = null
-    private val simMods: Map<String, String>? = null
-    private val mapname: String? = null
-    private val launchedAt: Double? = null
+    val gameType: VictoryCondition? = null
+    val simMods: Map<String, String>? = null
+    val mapname: String? = null
+    val launchedAt: Double? = null
     /**
      * The server may either send a single game or a list of games in the same message... *cringe*.
      */
-    var games: List<GameInfoMessage>? = null
+    val games: List<GameInfoMessage>? = null
 
     override fun toString(): String {
         return "GameInfo{" +
@@ -36,4 +29,18 @@ class GameInfoMessage : FafServerMessage(FafServerMessageType.GAME_INFO) {
                 ", state=" + state +
                 '}'.toString()
     }
+
+    fun isFull() = host != null &&
+                   passwordProtected != null &&
+                   visibility != null &&
+                   state != null &&
+                   numPlayers != null &&
+                   teams != null &&
+                   featuredModVersions != null &&
+                   featuredMod != null &&
+                   maxPlayers != null &&
+                   title != null &&
+                   gameType != null &&
+                   simMods != null &&
+                   mapname != null
 }

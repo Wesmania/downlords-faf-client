@@ -20,6 +20,7 @@ import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableMap
 import org.apache.commons.lang3.StringEscapeUtils
+import java.lang.RuntimeException
 
 import java.time.Instant
 import java.util.Optional
@@ -52,21 +53,27 @@ class Game() {
     var maxPlayers: Int by IntDelegate(maxPlayersProperty)
 
     val minRatingProperty: IntegerProperty = SimpleIntegerProperty(0)
-    var minRating: Int by IntDelegate(minRatingProperty)
+    var minRating: Int?
+            get() = minRatingProperty.value
+            set(v) {
+                minRatingProperty.value = v
+            }
 
     val maxRatingProperty: IntegerProperty = SimpleIntegerProperty(3000)
-    var maxRating: Int by IntDelegate(maxRatingProperty)
+    var maxRating: Int?
+        get() = maxRatingProperty.value
+        set(v) {
+            maxRatingProperty.value = v
+        }
 
     val passwordProtectedProperty: BooleanProperty = SimpleBooleanProperty()
-    val passwordProtected: Boolean
-            get() = passwordProtectedProperty.get()
+    val passwordProtected: Boolean by PropertyDelegate(passwordProtectedProperty)
 
     val passwordProperty: StringProperty = SimpleStringProperty()
     var password: String by PropertyDelegate(passwordProperty)
 
     val visibilityProperty: ObjectProperty<GameVisibility> = SimpleObjectProperty()
-    val visibility: GameVisibility
-        get() = visibilityProperty.get()
+    val visibility: GameVisibility by PropertyDelegate(visibilityProperty)
 
     val statusProperty: ObjectProperty<GameStatus> = SimpleObjectProperty()
     var status: GameStatus by PropertyDelegate(statusProperty)
@@ -75,7 +82,7 @@ class Game() {
     var victoryCondition: VictoryCondition by PropertyDelegate(victoryConditionProperty)
 
     val startTimeProperty: ObjectProperty<Instant> = SimpleObjectProperty()
-    var startTime: Instant by PropertyDelegate(startTimeProperty)
+    var startTime: Instant? by PropertyDelegate(startTimeProperty)
 
     /**
      * Maps a sim mod's UID to its name.
@@ -97,93 +104,118 @@ class Game() {
     var featuredModVersions by PropertyDelegate(featuredModVersionsProperty)
 
     constructor(gameInfoMessage: GameInfoMessage) : this() {
+        /* FIXME - add separate type for full messages to get rid of runtime checking here */
+        if (gameInfoMessage.isFull())
+            throw RuntimeException("Trying to construct a game from a partial message!")
         updateFromGameInfo(gameInfoMessage, true)
     }
 
     internal fun updateFromGameInfo(gameInfoMessage: GameInfoMessage) {
-        updateFromGameInfo(gameInfoMessage, false)
+        return updateFromGameInfo(gameInfoMessage, false)
     }
 
-    private fun updateFromGameInfo(gameInfoMessage: GameInfoMessage, isContructing: Boolean) {
+    private fun updateFromGameInfo(gameInfoMessage: GameInfoMessage, isConstructing: Boolean) {
         /* Since this method synchronizes on and updates members of "game", deadlocks can happen easily (updates can fire
      events on the event bus, and each event subscriber is synchronized as well). By ensuring that we run all updates
      in the application thread, we eliminate this risk. This is not required during construction of the game however,
      since members are not yet accessible from outside. */
-        if (!isContructing) {
+        if (!isConstructing) {
             JavaFxUtil.assertApplicationThread()
         }
 
-        id = gameInfoMessage.uid
-        host = gameInfoMessage.host
-        title = StringEscapeUtils.unescapeHtml4(gameInfoMessage.title)
-        mapFolderName = gameInfoMessage.mapname
-        featuredMod = gameInfoMessage.featuredMod
-        numPlayers = gameInfoMessage.numPlayers
-        maxPlayers = gameInfoMessage.maxPlayers
-        victoryCondition = gameInfoMessage.gameType
-        status = gameInfoMessage.state
-        passwordProtected = gameInfoMessage.passwordProtected
+        id = gameInfoMessage.uid ?: id
+        host = gameInfoMessage.host ?: host
+        if (gameInfoMessage.title != null)
+            title = StringEscapeUtils.unescapeHtml4(gameInfoMessage.title)
+        mapFolderName = gameInfoMessage.mapname ?: mapFolderName
+        featuredMod = gameInfoMessage.featuredMod ?: featuredMod
+        numPlayers = gameInfoMessage.numPlayers ?: numPlayers
+        maxPlayers = gameInfoMessage.maxPlayers ?: maxPlayers
+        victoryCondition = gameInfoMessage.gameType ?: victoryCondition
+        status = gameInfoMessage.state ?: status
+        passwordProtectedProperty.set(gameInfoMessage.passwordProtected ?: passwordProtected)
         Optional.ofNullable(gameInfoMessage.launchedAt).ifPresent {
             startTime = TimeUtil.fromPythonTime(floor(it)).toInstant()
         }
+        loadSimMods(gameInfoMessage)
+        loadTeams(gameInfoMessage)
+        loadFeaturedModVersions(gameInfoMessage)
+        parseRatingLimits()
+    }
 
+    private fun loadSimMods(gameInfoMessage: GameInfoMessage) {
         synchronized(simModsProperty.get()) {
             simMods.clear()
             if (gameInfoMessage.simMods != null) {
                 simMods.putAll(gameInfoMessage.simMods)
             }
         }
+    }
 
+    private fun loadTeams(gameInfoMessage: GameInfoMessage) {
         synchronized(teamsProperty.get()) {
             teams.clear()
             if (gameInfoMessage.teams != null) {
                 teams.putAll(gameInfoMessage.teams)
             }
         }
+    }
 
+    private fun loadFeaturedModVersions(gameInfoMessage: GameInfoMessage) {
         synchronized(featuredModVersionsProperty.get()) {
             featuredModVersions.clear()
             if (gameInfoMessage.featuredModVersions != null) {
                 featuredModVersions.putAll(gameInfoMessage.featuredModVersions)
             }
         }
+    }
 
+    private fun parseRatingLimits() {
         // TODO this can be removed as soon as we valueOf server side support. Until then, let's be hacky
         val titleString = title
+
         var matcher = BETWEEN_RATING_PATTERN.matcher(titleString)
         if (matcher.find()) {
             minRating = parseRating(matcher.group(1))
             maxRating = parseRating(matcher.group(2))
-        } else {
-            matcher = MIN_RATING_PATTERN.matcher(titleString)
-            if (matcher.find()) {
-                if (matcher.group(1) != null) {
-                    minRating = parseRating(matcher.group(1))
-                }
-                if (matcher.group(2) != null) {
-                    minRating = parseRating(matcher.group(2))
-                }
-                maxRating = 3000
+            return
+        }
+
+        matcher = MIN_RATING_PATTERN.matcher(titleString)
+        if (matcher.find()) {
+            maxRating = null
+            if (matcher.group(1) != null) {
+                minRating = parseRating(matcher.group(1))
+            }
+            if (matcher.group(2) != null) {
+                minRating = parseRating(matcher.group(2))
+            }
+            return
+        }
+
+        matcher = MAX_RATING_PATTERN.matcher(titleString)
+        if (matcher.find()) {
+            minRating = null
+            maxRating = parseRating(matcher.group(1))
+            return
+        }
+
+        matcher = ABOUT_RATING_PATTERN.matcher(titleString)
+        if (matcher.find()) {
+            val rating = parseRating(matcher.group(1))
+            if (rating != null) {
+                minRating = rating - 300
+                maxRating = rating + 300
             } else {
-                matcher = MAX_RATING_PATTERN.matcher(titleString)
-                if (matcher.find()) {
-                    minRating = 0
-                    maxRating = parseRating(matcher.group(1))
-                } else {
-                    matcher = ABOUT_RATING_PATTERN.matcher(titleString)
-                    if (matcher.find()) {
-                        val rating = parseRating(matcher.group(1))
-                        minRating = rating - 300
-                        maxRating = rating + 300
-                    }
-                }
+                minRating = null
+                maxRating = null
             }
         }
     }
 
-    private fun parseRating(string: String): Int {
-        try {
-            return Integer.parseInt(string)
+    private fun parseRating(string: String): Int? {
+        return try {
+            Integer.parseInt(string)
         } catch (e: NumberFormatException) {
             var rating: Int
             val split = string.replace("k", "").split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -192,9 +224,9 @@ class Game() {
                 if (split.size == 2) {
                     rating += Integer.parseInt(split[1]) * 100
                 }
-                return rating
+                rating
             } catch (e1: NumberFormatException) {
-                return Integer.MAX_VALUE
+                null
             }
         }
     }

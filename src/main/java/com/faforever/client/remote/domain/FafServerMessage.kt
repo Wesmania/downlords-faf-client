@@ -8,22 +8,15 @@ import java.util.Collections
  *
  * @see FafServerMessageType
  */
-open class FafServerMessage() : SerializableMessage, ServerMessage {
+open class FafServerMessage(
+        override val messageType: FafServerMessageType
+) : SerializableMessage, ServerMessage {
 
     /**
      * The server "command" actually isn't a command but identifies the object type.
      */
-    override val messageType: FafServerMessageType
-    override var target: MessageTarget? = null
+    override var target: MessageTarget = MessageTarget.CLIENT
 
     override val stringsToMask: Collection<String>
         get() = emptyList()
-
-    protected constructor(command: FafServerMessageType) : this() {
-        this.messageType = command
-    }
-
-    init {
-        target = MessageTarget.CLIENT
-    }
 }
