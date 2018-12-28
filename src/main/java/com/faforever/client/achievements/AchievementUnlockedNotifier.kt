@@ -26,7 +26,7 @@ constructor(private val notificationService: NotificationService, private val i1
 
     @PostConstruct
     internal fun postConstruct() {
-        fafService.addOnMessageListener(UpdatedAchievementsMessage::class.java, { this.onUpdatedAchievementsMessage(it) })
+        fafService.addOnMessageListener(UpdatedAchievementsMessage::class.java) { this.onUpdatedAchievementsMessage(it) }
     }
 
     private fun onUpdatedAchievementsMessage(message: UpdatedAchievementsMessage) {

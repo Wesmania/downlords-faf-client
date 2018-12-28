@@ -102,11 +102,11 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
                 .map { TournamentBean.fromTournamentDto(it) }
                 .collect(toList()))
 
-    fun <T : ServerMessage> addOnMessageListener(type: Class<T>, listener: (ServerMessage) -> Unit) {
+    fun <T : ServerMessage> addOnMessageListener(type: Class<T>, listener: (T) -> Unit) {
         fafServerAccessor.addOnMessageListener(type, listener)
     }
 
-    fun <T : ServerMessage> removeOnMessageListener(type: Class<T>, listener: (ServerMessage) -> Unit) {
+    fun <T : ServerMessage> removeOnMessageListener(type: Class<T>, listener: (T) -> Unit) {
         fafServerAccessor.removeOnMessageListener(type, listener)
     }
 
