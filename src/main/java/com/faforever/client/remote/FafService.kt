@@ -40,10 +40,8 @@ import org.springframework.util.Assert
 
 import javax.inject.Inject
 import java.nio.file.Path
-import java.util.Comparator
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
-import java.util.function.Consumer
 import java.util.stream.Collectors
 
 import java.util.stream.Collectors.toList
@@ -104,11 +102,11 @@ constructor(private val fafServerAccessor: FafServerAccessor, private val fafApi
                 .map { TournamentBean.fromTournamentDto(it) }
                 .collect(toList()))
 
-    fun <T : ServerMessage> addOnMessageListener(type: Class<T>, listener: Consumer<T>) {
+    fun <T : ServerMessage> addOnMessageListener(type: Class<T>, listener: (ServerMessage) -> Unit) {
         fafServerAccessor.addOnMessageListener(type, listener)
     }
 
-    fun <T : ServerMessage> removeOnMessageListener(type: Class<T>, listener: Consumer<T>) {
+    fun <T : ServerMessage> removeOnMessageListener(type: Class<T>, listener: (ServerMessage) -> Unit) {
         fafServerAccessor.removeOnMessageListener(type, listener)
     }
 

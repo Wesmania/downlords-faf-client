@@ -3,7 +3,6 @@ package com.faforever.client.remote
 import com.faforever.client.FafClientApplication
 import com.faforever.client.config.CacheNames
 import com.faforever.client.config.ClientProperties
-import com.faforever.client.config.ClientProperties.Server
 import com.faforever.client.fa.relay.GpgClientMessageSerializer
 import com.faforever.client.fa.relay.GpgGameMessage
 import com.faforever.client.fa.relay.GpgServerMessageType
@@ -13,11 +12,7 @@ import com.faforever.client.i18n.I18n
 import com.faforever.client.legacy.UidService
 import com.faforever.client.login.LoginFailedException
 import com.faforever.client.net.ConnectionState
-import com.faforever.client.notification.DismissAction
-import com.faforever.client.notification.ImmediateNotification
-import com.faforever.client.notification.NotificationService
-import com.faforever.client.notification.ReportAction
-import com.faforever.client.notification.Severity
+import com.faforever.client.notification.*
 import com.faforever.client.preferences.PreferencesService
 import com.faforever.client.rankedmatch.SearchLadder1v1ClientMessage
 import com.faforever.client.rankedmatch.StopSearchLadder1v1ClientMessage
@@ -78,7 +73,6 @@ import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.concurrent.Task
 import org.apache.commons.compress.utils.IOUtils
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.context.annotation.Lazy
@@ -95,12 +89,10 @@ import java.io.OutputStream
 import java.lang.invoke.MethodHandles
 import java.net.Socket
 import java.net.URL
-import java.util.Collections
 import java.util.HashMap
 import java.util.LinkedList
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
 
 import com.faforever.client.util.ConcurrentUtil.executeInBackground
 import java.nio.charset.StandardCharsets.UTF_8
@@ -108,7 +100,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 @Lazy
 @Component
 @Profile("!" + FafClientApplication.PROFILE_OFFLINE)
-class FafServerAccessorImpl @Inject
+final class FafServerAccessorImpl @Inject
 constructor(private val preferencesService: PreferencesService,
             private val uidService: UidService,
             private val notificationService: NotificationService,
@@ -116,7 +108,7 @@ constructor(private val preferencesService: PreferencesService,
             private val clientProperties: ClientProperties,
             private val reportingService: ReportingService) : AbstractServerAccessor(), FafServerAccessor {
     private val gson: Gson
-    private val messageListeners: HashMap<Class<out ServerMessage>, Collection<Consumer<ServerMessage>>>
+    private val messageListeners: HashMap<Class<out ServerMessage>, MutableCollection<(ServerMessage) -> Unit>> = HashMap()
     private var fafConnectionTask: Task<Void>? = null
     private var localIp: String? = null
     private var serverWriter: ServerWriter? = null
@@ -143,11 +135,10 @@ constructor(private val preferencesService: PreferencesService,
         get() {
             iceServersFuture = CompletableFuture()
             writeToServer(ListIceServersMessage())
-            return iceServersFuture
+            return iceServersFuture!!
         }
 
     init {
-        messageListeners = HashMap()
         connectionState = SimpleObjectProperty()
         sessionId = SimpleObjectProperty()
         // TODO note to myself; seriously, create a single gson instance (or builder) and put it all there
@@ -189,15 +180,15 @@ constructor(private val preferencesService: PreferencesService,
                 listOf<Action>(DismissAction(i18n))))
     }
 
-    override fun <T : ServerMessage> addOnMessageListener(type: Class<T>, listener: Consumer<T>) {
+    override fun <T : ServerMessage> addOnMessageListener(type: Class<T>, listener: (T) -> Unit) {
         if (!messageListeners.containsKey(type)) {
             messageListeners[type] = LinkedList()
         }
-        messageListeners[type].add(listener as Consumer<ServerMessage>)
+        messageListeners[type]!!.add(listener as (ServerMessage) -> Unit)
     }
 
-    override fun <T : ServerMessage> removeOnMessageListener(type: Class<T>, listener: Consumer<T>) {
-        messageListeners[type].remove(listener)
+    override fun <T : ServerMessage> removeOnMessageListener(type: Class<T>, listener: (T) -> Unit) {
+        messageListeners[type]!!.remove(listener)
     }
 
     override fun connectionStateProperty(): ReadOnlyObjectProperty<ConnectionState> {
@@ -385,13 +376,9 @@ constructor(private val preferencesService: PreferencesService,
 
             var messageClass: Class<*> = serverMessage.javaClass
             while (messageClass != Any::class.java) {
-                (messageListeners as java.util.Map<Class<out ServerMessage>, Collection<Consumer<ServerMessage>>>).getOrDefault(messageClass, emptyList())
-                        .forEach { consumer -> consumer.accept(serverMessage) }
+                messageListeners.getOrDefault(messageClass, mutableListOf())
+                        .forEach { consumer -> consumer(serverMessage) }
                 messageClass = messageClass.superclass
-            }
-            for (type in ClassUtils.getAllInterfacesForClassAsSet(messageClass)) {
-                (messageListeners as java.util.Map<Class<out ServerMessage>, Collection<Consumer<ServerMessage>>>).getOrDefault(messageClass, emptyList())
-                        .forEach { consumer -> consumer.accept(serverMessage) }
             }
         } catch (e: JsonSyntaxException) {
             logger.warn("Could not deserialize message: " + jsonString!!, e)

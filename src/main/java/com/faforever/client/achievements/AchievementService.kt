@@ -75,7 +75,7 @@ constructor(private val fafService: FafService, private val playerService: Playe
 
     @PostConstruct
     internal fun postConstruct() {
-        fafService.addOnMessageListener(UpdatedAchievementsMessage::class.java) { updatedAchievementsMessage -> reloadAchievements() }
+        fafService.addOnMessageListener(UpdatedAchievementsMessage::class.java) { _ -> reloadAchievements() }
     }
 
     enum class AchievementState {

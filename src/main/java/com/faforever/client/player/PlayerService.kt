@@ -66,8 +66,8 @@ class PlayerService(private val fafService: FafService, private val userService:
     @PostConstruct
     internal fun postConstruct() {
         eventBus.register(this)
-        fafService.addOnMessageListener(PlayersMessage::class.java, Consumer<PlayersMessage> { this.onPlayersInfo(it) })
-        fafService.addOnMessageListener(SocialMessage::class.java, Consumer<SocialMessage> { this.onFoeList(it) })
+        fafService.addOnMessageListener(PlayersMessage::class.java, { this.onPlayersInfo(it) })
+        fafService.addOnMessageListener(SocialMessage::class.java, { this.onFoeList(it) })
     }
 
     @Subscribe

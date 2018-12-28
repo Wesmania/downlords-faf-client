@@ -13,7 +13,6 @@ import javafx.beans.property.ReadOnlyObjectProperty
 
 import java.net.URL
 import java.util.concurrent.CompletableFuture
-import java.util.function.Consumer
 
 /**
  * Entry class for all communication with the FAF server.
@@ -24,9 +23,9 @@ interface FafServerAccessor {
 
     val iceServers: CompletableFuture<List<IceServer>>
 
-    fun <T : ServerMessage> addOnMessageListener(type: Class<T>, listener: Consumer<T>)
+    fun <T : ServerMessage> addOnMessageListener(type: Class<T>, listener: (T) -> Unit)
 
-    fun <T : ServerMessage> removeOnMessageListener(type: Class<T>, listener: Consumer<T>)
+    fun <T : ServerMessage> removeOnMessageListener(type: Class<T>, listener: (T) -> Unit)
 
     fun connectionStateProperty(): ReadOnlyObjectProperty<ConnectionState>
 

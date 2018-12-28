@@ -49,6 +49,14 @@ sourceSets {
     main.java.srcDirs += 'src/main/java'
 }
 
+compileKotlin {
+  kotlinOptions {
+    languageVersion = "1.4"
+    apiVersion = "1.4"
+    jvmTarget = "1.8"
+  }
+}
+
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 

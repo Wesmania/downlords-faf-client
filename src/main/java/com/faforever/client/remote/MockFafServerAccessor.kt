@@ -31,7 +31,6 @@ import com.google.common.eventbus.EventBus
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.SimpleObjectProperty
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Profile
@@ -41,19 +40,16 @@ import javax.inject.Inject
 import java.lang.invoke.MethodHandles
 import java.net.URL
 import java.util.Arrays
-import java.util.Collections
 import java.util.HashMap
 import java.util.LinkedList
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.CompletableFuture
-import java.util.function.Consumer
 
 import com.faforever.client.remote.domain.GameAccess.PASSWORD
 import com.faforever.client.remote.domain.GameAccess.PUBLIC
 import com.faforever.client.task.CompletableTask.Priority.HIGH
 import java.util.Collections.emptyList
-import java.util.Collections.singletonList
 
 @Lazy
 @Component
@@ -62,7 +58,7 @@ import java.util.Collections.singletonList
 class MockFafServerAccessor @Inject
 constructor(private val taskService: TaskService, private val notificationService: NotificationService, private val i18n: I18n, private val eventBus: EventBus) : FafServerAccessor {
     private val timer: Timer
-    private val messageListeners: HashMap<Class<out ServerMessage>, Collection<Consumer<ServerMessage>>>
+    private val messageListeners: HashMap<Class<out ServerMessage>, Collection<(ServerMessage) -> Unit>>
 
     private val connectionState: ObjectProperty<ConnectionState>
 
@@ -78,14 +74,14 @@ constructor(private val taskService: TaskService, private val notificationServic
         connectionState = SimpleObjectProperty()
     }
 
-    override fun <T : ServerMessage> addOnMessageListener(type: Class<T>, listener: Consumer<T>) {
+    override fun <T : ServerMessage> addOnMessageListener(type: Class<T>, listener: (T) -> Unit) {
         if (!messageListeners.containsKey(type)) {
             messageListeners[type] = LinkedList()
         }
-        messageListeners[type].add(listener as Consumer<ServerMessage>)
+        messageListeners[type].add(listener)
     }
 
-    override fun <T : ServerMessage> removeOnMessageListener(type: Class<T>, listener: Consumer<T>) {
+    override fun <T : ServerMessage> removeOnMessageListener(type: Class<T>, listener: (T) -> Unit) {
         messageListeners[type].remove(listener)
     }
 
@@ -113,7 +109,7 @@ constructor(private val taskService: TaskService, private val notificationServic
 
                 eventBus.post(LoginSuccessEvent(username, password, player.id))
 
-                (messageListeners as java.util.Map<Class<out ServerMessage>, Collection<Consumer<ServerMessage>>>).getOrDefault(playersMessage.javaClass, emptyList()).forEach { consumer -> consumer.accept(playersMessage) }
+                (messageListeners as java.util.Map<Class<out ServerMessage>, Collection<(ServerMessage) -> Unit>>).getOrDefault(playersMessage.javaClass, emptyList()).forEach { consumer -> consumer.accept(playersMessage) }
 
                 timer.schedule(object : TimerTask() {
                     override fun run() {
@@ -123,7 +119,7 @@ constructor(private val taskService: TaskService, private val notificationServic
                         updatedAchievement.newlyUnlocked = true
                         updatedAchievementsMessage.updatedAchievements = Arrays.asList(updatedAchievement)
 
-                        (messageListeners as java.util.Map<Class<out ServerMessage>, Collection<Consumer<ServerMessage>>>).getOrDefault(updatedAchievementsMessage.javaClass, emptyList()).forEach { consumer -> consumer.accept(updatedAchievementsMessage) }
+                        (messageListeners as java.util.Map<Class<out ServerMessage>, Collection<(ServerMessage) -> Unit>>).getOrDefault(updatedAchievementsMessage.javaClass, emptyList()).forEach { consumer -> consumer.accept(updatedAchievementsMessage) }
                     }
                 }, 7000)
 
@@ -131,7 +127,7 @@ constructor(private val taskService: TaskService, private val notificationServic
                     override fun run() {
                         val matchmakerServerMessage = MatchmakerMessage()
                         matchmakerServerMessage.queues = listOf(MatchmakerQueue("ladder1v1", listOf(RatingRange(100, 200)), listOf(RatingRange(100, 200))))
-                        (messageListeners as java.util.Map<Class<out ServerMessage>, Collection<Consumer<ServerMessage>>>).getOrDefault(matchmakerServerMessage.javaClass, emptyList()).forEach { consumer -> consumer.accept(matchmakerServerMessage) }
+                        (messageListeners as java.util.Map<Class<out ServerMessage>, Collection<(ServerMessage) -> Unit>>).getOrDefault(matchmakerServerMessage.javaClass, emptyList()).forEach { consumer -> consumer.accept(matchmakerServerMessage) }
                     }
                 }, 7000)
 
@@ -146,7 +142,7 @@ constructor(private val taskService: TaskService, private val notificationServic
                 )
 
                 gameInfoMessages.forEach { gameInfoMessage ->
-                    (messageListeners as java.util.Map<Class<out ServerMessage>, Collection<Consumer<ServerMessage>>>).getOrDefault(gameInfoMessage.javaClass, emptyList())
+                    (messageListeners as java.util.Map<Class<out ServerMessage>, Collection<(ServerMessage) -> Unit>>).getOrDefault(gameInfoMessage.javaClass, emptyList())
                             .forEach { consumer -> consumer.accept(gameInfoMessage) }
                 }
 

@@ -68,13 +68,13 @@ class FafClientApplication : Application() {
     }
 
     companion object {
-        val PROFILE_PROD = "prod"
-        val PROFILE_TEST = "test"
-        val PROFILE_LOCAL = "local"
-        val PROFILE_OFFLINE = "offline"
-        val PROFILE_WINDOWS = "windows"
-        val PROFILE_LINUX = "linux"
-        val PROFILE_MAC = "mac"
+       const val PROFILE_PROD = "prod"
+       const val PROFILE_TEST = "test"
+       const val PROFILE_LOCAL = "local"
+       const val PROFILE_OFFLINE = "offline"
+       const val PROFILE_WINDOWS = "windows"
+       const val PROFILE_LINUX = "linux"
+       const val PROFILE_MAC = "mac"
 
         @JvmStatic
         fun main(args: Array<String>) {
