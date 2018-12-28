@@ -41,27 +41,21 @@ import com.faforever.client.player.SocialStatus.FOE
 import com.faforever.client.player.SocialStatus.FRIEND
 import com.faforever.client.player.SocialStatus.OTHER
 import com.faforever.client.player.SocialStatus.SELF
+import com.faforever.client.util.PropertyDelegate
 
 @Service
 class PlayerService(private val fafService: FafService, private val userService: UserService, private val eventBus: EventBus) {
 
-    private val playersByName: ObservableMap<String, Player>
-    private val playersById: ObservableMap<Int, Player>
-    private val foeList: MutableList<Int>
-    private val friendList: MutableList<Int>
-    private val currentPlayer: ObjectProperty<Player>
+    private val playersByName: ObservableMap<String, Player> = FXCollections.observableMap(ConcurrentHashMap())
+    private val playersById: ObservableMap<Int, Player> = FXCollections.observableHashMap()
+    private val foeList: MutableList<Int> = ArrayList()
+    private val friendList: MutableList<Int> = ArrayList()
+    val currentPlayerProperty: ObjectProperty<Player> = SimpleObjectProperty()
+    var currentPlayer: Optional<Player> = Optional.empty()
+        get() = Optional.ofNullable(currentPlayerProperty.get())
 
     val playerNames: Set<String>
         get() = HashSet(playersByName.keys)
-
-    init {
-
-        playersByName = FXCollections.observableMap(ConcurrentHashMap())
-        playersById = FXCollections.observableHashMap()
-        friendList = ArrayList()
-        foeList = ArrayList()
-        currentPlayer = SimpleObjectProperty()
-    }
 
     @PostConstruct
     internal fun postConstruct() {
@@ -72,20 +66,20 @@ class PlayerService(private val fafService: FafService, private val userService:
 
     @Subscribe
     fun onGameAdded(event: GameAddedEvent) {
-        updateGameForPlayersInGame(event.getGame())
+        updateGameForPlayersInGame(event.game)
     }
 
     @Subscribe
     fun onGameUpdated(event: GameUpdatedEvent) {
-        updateGameForPlayersInGame(event.getGame())
+        updateGameForPlayersInGame(event.game)
     }
 
     @Subscribe
     fun onGameRemoved(event: GameRemovedEvent) {
-        val game = event.getGame()
-        val teams = game.getTeams()
+        val game = event.game
+        val teams = game.teams
         synchronized(teams) {
-            teams.forEach({ team, players -> updateGamePlayers(players, null) })
+            teams.forEach { team, players -> updateGamePlayers(players, null) }
         }
     }
 
@@ -207,14 +201,6 @@ class PlayerService(private val fafService: FafService, private val userService:
         foeList.remove(player.id)
 
         fafService.removeFoe(player)
-    }
-
-    fun getCurrentPlayer(): Optional<Player> {
-        return Optional.ofNullable(currentPlayer.get())
-    }
-
-    fun currentPlayerProperty(): ReadOnlyObjectProperty<Player> {
-        return currentPlayer
     }
 
     fun getPlayersByIds(playerIds: Collection<Int>): CompletableFuture<List<Player>> {
