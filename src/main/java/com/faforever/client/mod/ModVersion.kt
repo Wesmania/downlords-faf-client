@@ -2,7 +2,6 @@ package com.faforever.client.mod
 
 import com.faforever.client.vault.review.Review
 import com.faforever.commons.mod.MountInfo
-import javafx.beans.Observable
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.IntegerProperty
 import javafx.beans.property.ListProperty
@@ -15,249 +14,112 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
-import lombok.Getter
 import org.apache.maven.artifact.versioning.ComparableVersion
+
+import tornadofx.getValue
+import tornadofx.setValue
 
 import java.net.URL
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDateTime
-import java.time.OffsetDateTime
 import java.util.Objects
 import java.util.Optional
-import java.util.stream.Collectors
+import java.util.stream.Collectors.toList
 
 class ModVersion {
-    val displayName: StringProperty = SimpleStringProperty()
-    val imagePath: ObjectProperty<Path> = SimpleObjectProperty()
+    val displayNameProperty: StringProperty = SimpleStringProperty()
+    var displayName by displayNameProperty
+
+    val imagePathProperty: ObjectProperty<Path> = SimpleObjectProperty()
+    var imagePath by imagePathProperty
+
     /**
      * Entity ID as provided by the API (DB primary key).
+     * The ID within the database. `null` in case the mod was loaded locally.
      */
-    val id: StringProperty
+    val idProperty: StringProperty = SimpleStringProperty()
+    var id by idProperty
+
     /**
      * UID as specified in the mod itself (specified by the uploader).
      */
-    val uid: StringProperty = SimpleStringProperty()
-    val description: StringProperty = SimpleStringProperty()
-    val uploader: StringProperty = SimpleStringProperty()
-    val selectable: BooleanProperty = SimpleBooleanProperty()
-    val version: ObjectProperty<ComparableVersion> = SimpleObjectProperty()
-    val thumbnailUrl: ObjectProperty<URL> = SimpleObjectProperty()
-    val comments: ListProperty<String>
-    val selected: BooleanProperty = SimpleBooleanProperty()
-    val likes: IntegerProperty
-    val played: IntegerProperty
-    val createTime: ObjectProperty<LocalDateTime> = SimpleObjectProperty()
-    val updateTime: ObjectProperty<LocalDateTime> = SimpleObjectProperty()
-    val downloadUrl: ObjectProperty<URL> = SimpleObjectProperty()
-    val mountPoints: ListProperty<MountInfo>
-    val hookDirectories: ListProperty<String>
-    val reviews: ListProperty<Review>
-    val reviewsSummary: ObjectProperty<ReviewsSummary> = SimpleObjectProperty()
-    val modType: ObjectProperty<ModType> = SimpleObjectProperty()
-    val filename: StringProperty = SimpleStringProperty()
-    val icon: StringProperty = SimpleStringProperty()
-    val ranked: BooleanProperty = SimpleBooleanProperty()
-    val hidden: BooleanProperty = SimpleBooleanProperty()
-    val mod: ObjectProperty<Mod> = SimpleObjectProperty()
+    val uidProperty: StringProperty = SimpleStringProperty()
+    var uid: String by uidProperty
 
-    val mountInfos: ObservableList<MountInfo>
-        get() = mountPoints.get()
+    val descriptionProperty: StringProperty = SimpleStringProperty()
+    var description: String by descriptionProperty
 
-    var isRanked: Boolean
-        get() = ranked.get()
-        set(ranked) = this.ranked.set(ranked)
+    val uploaderProperty: StringProperty = SimpleStringProperty()
+    var uploader: String by uploaderProperty
 
-    var isHidden: Boolean
-        get() = hidden.get()
-        set(hidden) = this.hidden.set(hidden)
+    val selectableProperty: BooleanProperty = SimpleBooleanProperty()
+    var selectable: Boolean by selectableProperty
 
-    init {
-        displayName = SimpleStringProperty()
-        imagePath = SimpleObjectProperty()
-        id = SimpleStringProperty()
-        version = SimpleObjectProperty()
-        likes = SimpleIntegerProperty()
-        played = SimpleIntegerProperty()
-        createTime = SimpleObjectProperty()
-        updateTime = SimpleObjectProperty()
-        reviewsSummary = SimpleObjectProperty()
-        thumbnailUrl = SimpleObjectProperty()
-        comments = SimpleListProperty(FXCollections.observableArrayList())
-        downloadUrl = SimpleObjectProperty()
-        mountPoints = SimpleListProperty(FXCollections.observableArrayList())
-        hookDirectories = SimpleListProperty(FXCollections.observableArrayList())
-        reviews = SimpleListProperty(FXCollections.observableArrayList { param -> arrayOf(param.scoreProperty(), param.textProperty()) })
-        modType = SimpleObjectProperty()
-        mod = SimpleObjectProperty()
-    }
+    val versionProperty: ObjectProperty<ComparableVersion> = SimpleObjectProperty()
+    var version: ComparableVersion by versionProperty
 
-    fun getDownloadUrl(): URL {
-        return downloadUrl.get()
-    }
+    val thumbnailUrlProperty: ObjectProperty<URL> = SimpleObjectProperty()
+    var thumbnailUrl: URL by thumbnailUrlProperty
 
-    fun setDownloadUrl(downloadUrl: URL) {
-        this.downloadUrl.set(downloadUrl)
-    }
+    val commentsProperty: ListProperty<String> = SimpleListProperty(FXCollections.observableArrayList())
+    var comments: ObservableList<String> by commentsProperty
 
-    fun downloadUrlProperty(): ObjectProperty<URL> {
-        return downloadUrl
-    }
+    val selectedProperty: BooleanProperty = SimpleBooleanProperty()
+    var selected: Boolean by selectedProperty
 
-    fun getSelected(): Boolean {
-        return selected.get()
-    }
+    val likesProperty: IntegerProperty = SimpleIntegerProperty()
+    var likes: Int by likesProperty
 
-    fun setSelected(selected: Boolean) {
-        this.selected.set(selected)
-    }
+    val playedProperty: IntegerProperty = SimpleIntegerProperty()
+    var played: Int by playedProperty
 
-    fun selectedProperty(): BooleanProperty {
-        return selected
-    }
+    val createTimeProperty: ObjectProperty<LocalDateTime> = SimpleObjectProperty()
+    var createTime: LocalDateTime by createTimeProperty
 
-    fun getUploader(): String {
-        return uploader.get()
-    }
+    val updateTimeProperty: ObjectProperty<LocalDateTime> = SimpleObjectProperty()
+    var updateTime: LocalDateTime by updateTimeProperty
 
-    fun setUploader(uploader: String) {
-        this.uploader.set(uploader)
-    }
+    val downloadUrlProperty: ObjectProperty<URL> = SimpleObjectProperty()
+    var downloadUrl: URL by downloadUrlProperty
 
-    fun getSelectable(): Boolean {
-        return selectable.get()
-    }
+    val mountPointsProperty: ListProperty<MountInfo> = SimpleListProperty(FXCollections.observableArrayList())
+    val mountInfos: ObservableList<MountInfo> by mountPointsProperty
 
-    fun setSelectable(selectable: Boolean) {
-        this.selectable.set(selectable)
-    }
+    val hookDirectoriesProperty: ListProperty<String> = SimpleListProperty(FXCollections.observableArrayList())
+    val hookDirectories: ObservableList<String> by hookDirectoriesProperty
 
-    fun selectableProperty(): BooleanProperty {
-        return selectable
-    }
+    val reviewsProperty: ListProperty<Review> = SimpleListProperty(FXCollections.observableArrayList { arrayOf(it.scoreProperty(), it.textProperty()) })
+    var reviews: ObservableList<Review> by reviewsProperty
 
-    fun getDescription(): String {
-        return description.get()
-    }
+    val reviewsSummaryProperty: ObjectProperty<ReviewsSummary> = SimpleObjectProperty()
+    var reviewsSummary: ReviewsSummary by reviewsSummaryProperty
 
-    fun setDescription(description: String) {
-        this.description.set(description)
-    }
+    val modTypeProperty: ObjectProperty<ModType> = SimpleObjectProperty()
+    var modType: ModType by modTypeProperty
 
-    fun descriptionProperty(): StringProperty {
-        return description
-    }
+    val filenameProperty: StringProperty = SimpleStringProperty()
+    var filename: String by filenameProperty
 
-    fun getVersion(): ComparableVersion {
-        return version.get()
-    }
+    val iconProperty: StringProperty = SimpleStringProperty()
+    var icon: String by iconProperty
 
-    fun setVersion(version: ComparableVersion) {
-        this.version.set(version)
-    }
+    val rankedProperty: BooleanProperty = SimpleBooleanProperty()
+    var ranked: Boolean by rankedProperty
 
-    fun versionProperty(): ObjectProperty<ComparableVersion> {
-        return version
-    }
+    val hiddenProperty: BooleanProperty = SimpleBooleanProperty()
+    var hidden: Boolean by hiddenProperty
 
-    fun getImagePath(): Path {
-        return imagePath.get()
-    }
-
-    fun setImagePath(imagePath: Path) {
-        this.imagePath.set(imagePath)
-    }
-
-    fun imagePathProperty(): ObjectProperty<Path> {
-        return imagePath
-    }
-
-    fun uploaderProperty(): StringProperty {
-        return uploader
-    }
-
-    fun getDisplayName(): String {
-        return displayName.get()
-    }
-
-    fun setDisplayName(displayName: String) {
-        this.displayName.set(displayName)
-    }
-
-    /**
-     * The ID within the database. `null` in case the mod was loaded locally.
-     */
-    fun getId(): String? {
-        return id.get()
-    }
-
-    fun setId(id: String) {
-        this.id.set(id)
-    }
-
-    fun idProperty(): StringProperty {
-        return id
-    }
-
-    fun getLikes(): Int {
-        return likes.get()
-    }
-
-    fun setLikes(likes: Int) {
-        this.likes.set(likes)
-    }
-
-    fun likesProperty(): IntegerProperty {
-        return likes
-    }
-
-    fun getPlayed(): Int {
-        return played.get()
-    }
-
-    fun setPlayed(played: Int) {
-        this.played.set(played)
-    }
-
-    fun playedProperty(): IntegerProperty {
-        return played
-    }
-
-    fun displayNameProperty(): StringProperty {
-        return displayName
-    }
-
-    fun getCreateTime(): LocalDateTime {
-        return createTime.get()
-    }
-
-    fun setCreateTime(createTime: LocalDateTime) {
-        this.createTime.set(createTime)
-    }
-
-    fun getThumbnailUrl(): URL {
-        return thumbnailUrl.get()
-    }
-
-    fun setThumbnailUrl(thumbnailUrl: URL) {
-        this.thumbnailUrl.set(thumbnailUrl)
-    }
-
-    fun thumbnailUrlProperty(): ObjectProperty<URL> {
-        return thumbnailUrl
-    }
-
-    fun commentsProperty(): ListProperty<String> {
-        return comments
-    }
+    val modProperty: ObjectProperty<Mod> = SimpleObjectProperty()
+    var mod: Mod by modProperty
 
     override fun hashCode(): Int {
-        return Objects.hash(uid.get())
+        return Objects.hash(uid)
     }
 
     override fun equals(o: Any?): Boolean {
-        if (o is ModVersion && o.getUid() != null && getUid() != null) {
-            return o.getUid() == this.getUid()
+        if (o is ModVersion && o.uid != null && uid != null) {
+            return o.uid == this.uid
         }
         if (this === o) {
             return true
@@ -265,132 +127,11 @@ class ModVersion {
         if (o == null || javaClass != o.javaClass) {
             return false
         }
-        val that = o as ModVersion?
-        return uid.get() == that!!.uid.get()
+        val that = o as ModVersion
+        return uid == that.uid
     }
 
-    fun getComments(): ObservableList<String> {
-        return comments.get()
-    }
-
-    fun setComments(comments: ObservableList<String>) {
-        this.comments.set(comments)
-    }
-
-    fun getHookDirectories(): ObservableList<String> {
-        return hookDirectories.get()
-    }
-
-    fun getReviews(): ObservableList<Review> {
-        return reviews.get()
-    }
-
-    fun setReviews(reviews: ObservableList<Review>) {
-        this.reviews.set(reviews)
-    }
-
-    fun reviewsProperty(): ListProperty<Review> {
-        return reviews
-    }
-
-    fun getUid(): String? {
-        return uid.get()
-    }
-
-    fun setUid(uid: String) {
-        this.uid.set(uid)
-    }
-
-    fun uidProperty(): StringProperty {
-        return uid
-    }
-
-    fun createTimeProperty(): ObjectProperty<LocalDateTime> {
-        return createTime
-    }
-
-    fun getUpdateTime(): LocalDateTime {
-        return updateTime.get()
-    }
-
-    fun setUpdateTime(updateTime: LocalDateTime) {
-        this.updateTime.set(updateTime)
-    }
-
-    fun updateTimeProperty(): ObjectProperty<LocalDateTime> {
-        return updateTime
-    }
-
-    fun getReviewsSummary(): ReviewsSummary {
-        return reviewsSummary.get()
-    }
-
-    fun setReviewsSummary(reviewsSummary: ReviewsSummary) {
-        this.reviewsSummary.set(reviewsSummary)
-    }
-
-    fun reviewsSummaryProperty(): ObjectProperty<ReviewsSummary> {
-        return reviewsSummary
-    }
-
-    fun getModType(): ModType {
-        return modType.get()
-    }
-
-    fun setModType(modType: ModType) {
-        this.modType.set(modType)
-    }
-
-    fun modTypeProperty(): ObjectProperty<ModType> {
-        return modType
-    }
-
-    fun getFilename(): String {
-        return filename.get()
-    }
-
-    fun setFilename(filename: String) {
-        this.filename.set(filename)
-    }
-
-    fun filenameProperty(): StringProperty {
-        return filename
-    }
-
-    fun getIcon(): String {
-        return icon.get()
-    }
-
-    fun setIcon(icon: String) {
-        this.icon.set(icon)
-    }
-
-    fun iconProperty(): StringProperty {
-        return icon
-    }
-
-    fun rankedProperty(): BooleanProperty {
-        return ranked
-    }
-
-    fun hiddenProperty(): BooleanProperty {
-        return hidden
-    }
-
-    fun getMod(): Mod {
-        return mod.get()
-    }
-
-    fun setMod(mod: Mod) {
-        this.mod.set(mod)
-    }
-
-    fun modProperty(): ObjectProperty<Mod> {
-        return mod
-    }
-
-    enum class ModType private constructor(@field:Getter
-                                           private val i18nKey: String) {
+    enum class ModType private constructor(val i18nKey: String) {
         UI("modType.ui"),
         SIM("modType.sim");
 
@@ -410,67 +151,66 @@ class ModVersion {
          */
         internal fun fromModInfo(modInfo: com.faforever.commons.mod.Mod, basePath: Path): ModVersion {
             val modVersion = ModVersion()
-            modVersion.setUid(modInfo.uid)
-            modVersion.setDisplayName(modInfo.name)
-            modVersion.setDescription(modInfo.description)
-            modVersion.setUploader(modInfo.author)
-            modVersion.setVersion(modInfo.version)
-            modVersion.setSelectable(modInfo.isSelectable)
-            modVersion.setModType(if (modInfo.isUiOnly) ModType.UI else ModType.SIM)
+            modVersion.uid = modInfo.uid
+            modVersion.displayName = modInfo.name
+            modVersion.description = modInfo.description
+            modVersion.uploader = modInfo.author
+            modVersion.version = modInfo.version
+            modVersion.selectable = modInfo.isSelectable
+            modVersion.modType = if (modInfo.isUiOnly) ModType.UI else ModType.SIM
             modVersion.mountInfos.setAll(modInfo.mountInfos)
-            modVersion.getHookDirectories().setAll(modInfo.hookDirectories)
+            modVersion.hookDirectories.setAll(modInfo.hookDirectories)
             Optional.ofNullable(modInfo.icon)
                     .map { icon -> Paths.get(icon) }
                     .filter { iconPath -> iconPath.nameCount > 2 }
-                    .ifPresent { iconPath -> modVersion.setImagePath(basePath.resolve(iconPath.subpath(2, iconPath.nameCount))) }
+                    .ifPresent { iconPath -> modVersion.imagePath = basePath.resolve(iconPath.subpath(2, iconPath.nameCount)) }
             return modVersion
         }
 
         fun fromDto(dto: com.faforever.client.api.dto.ModVersion, parent: Mod): ModVersion {
             val modVersionVersion = ModVersion()
-            modVersionVersion.setVersion(dto.getVersion())
-            modVersionVersion.setId(dto.getId())
-            modVersionVersion.setUid(dto.getUid())
-            modVersionVersion.setModType(ModType.fromDto(dto.getType()))
-            modVersionVersion.setDescription(dto.getDescription())
-            modVersionVersion.setFilename(dto.getFilename())
-            modVersionVersion.setIcon(dto.getIcon())
-            modVersionVersion.isRanked = dto.isRanked()
-            modVersionVersion.isHidden = dto.isHidden()
-            Optional.ofNullable(dto.getCreateTime())
-                    .ifPresent({ offsetDateTime -> modVersionVersion.setCreateTime(offsetDateTime.toLocalDateTime()) })
-            Optional.ofNullable(dto.getUpdateTime())
-                    .ifPresent({ offsetDateTime -> modVersionVersion.setUpdateTime(offsetDateTime.toLocalDateTime()) })
-            modVersionVersion.setThumbnailUrl(dto.getThumbnailUrl())
-            modVersionVersion.setDownloadUrl(dto.getDownloadUrl())
-            val mod = Optional.ofNullable(parent)
-                    .orElseGet { Mod.fromDto(dto.getMod()) }
-            modVersionVersion.setMod(mod)
+            modVersionVersion.version = dto.version
+            modVersionVersion.id = dto.id
+            modVersionVersion.uid = dto.uid
+            modVersionVersion.modType = ModType.fromDto(dto.type)
+            modVersionVersion.description = dto.description
+            modVersionVersion.filename = dto.filename
+            modVersionVersion.icon = dto.icon
+            modVersionVersion.ranked = dto.ranked
+            modVersionVersion.hidden = dto.hidden
+            Optional.ofNullable(dto.createTime)
+                    .ifPresent { modVersionVersion.createTime = it.toLocalDateTime() }
+            Optional.ofNullable(dto.updateTime)
+                    .ifPresent{ modVersionVersion.updateTime = it.toLocalDateTime() }
+            modVersionVersion.thumbnailUrl = dto.thumbnailUrl
+            modVersionVersion.downloadUrl = dto.downloadUrl
+            modVersionVersion.mod = Optional.ofNullable(parent)
+                    .orElseGet { Mod.fromDto(dto.mod) }
             return modVersionVersion
         }
 
         fun fromModDto(dto: com.faforever.client.api.dto.Mod): ModVersion {
-            val modVersionVersion = dto.getLatestVersion()
+            val modVersionVersion = dto.latestVersion
 
             val modVersion = ModVersion()
-            Optional.ofNullable(dto.getUploader()).ifPresent({ uploader -> modVersion.setUploader(uploader.getLogin()) })
-            modVersion.setDescription(modVersionVersion.getDescription())
-            modVersion.setDisplayName(dto.getDisplayName())
-            modVersion.setId(modVersionVersion.getId())
-            modVersion.setUid(modVersionVersion.getUid())
-            modVersion.setVersion(modVersionVersion.getVersion())
-            modVersion.setDownloadUrl(modVersionVersion.getDownloadUrl())
-            modVersion.setThumbnailUrl(modVersionVersion.getThumbnailUrl())
-            modVersion.setReviewsSummary(ReviewsSummary.fromDto(modVersionVersion.getModVersionReviewsSummary()))
-            modVersion.setCreateTime(modVersionVersion.getCreateTime().toLocalDateTime())
-            Optional.ofNullable(dto.getUpdateTime()).map(Function<T, U> { it.toLocalDateTime() }).ifPresent(Consumer<U> { modVersion.setUpdateTime(it) })
-            modVersion.getReviews().setAll(
-                    dto.getVersions().stream()
-                            .filter({ v -> v.getReviews() != null })
-                            .flatMap({ v -> v.getReviews().parallelStream() })
-                            .map(???({ Review.fromDto(it) }))
-            .collect(Collectors.toList<T>()))
-            modVersion.setModType(ModType.fromDto(modVersionVersion.getType()))
+            Optional.ofNullable(dto.uploader).ifPresent { modVersion.uploader = it.login }
+            modVersion.description = modVersionVersion.description
+            modVersion.displayName = dto.displayName
+            modVersion.id = modVersionVersion.id
+            modVersion.uid = modVersionVersion.uid
+            modVersion.version = modVersionVersion.version
+            modVersion.downloadUrl = modVersionVersion.downloadUrl
+            modVersion.thumbnailUrl = modVersionVersion.thumbnailUrl
+            modVersion.reviewsSummary = ReviewsSummary.fromDto(modVersionVersion.modVersionReviewsSummary)
+            modVersion.createTime = modVersionVersion.createTime.toLocalDateTime())
+            Optional.ofNullable(dto.updateTime).map { it.toLocalDateTime() }.ifPresent { modVersion.updateTime = it }
+            modVersion.reviews.setAll(
+                    dto.versions!!.stream()
+                            .filter { it.reviews != null }
+                            .flatMap { it.reviews.parallelStream() }
+                            .map { Review.fromDto(it) }
+            .collect(toList()))
+            modVersion.modType = ModType.fromDto(modVersionVersion.type)
             return modVersion
         }
     }

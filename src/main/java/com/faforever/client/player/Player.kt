@@ -25,6 +25,7 @@ import tornadofx.setValue
 
 import com.faforever.client.player.SocialStatus.OTHER
 import java.util.concurrent.Callable
+import java.util.stream.Collectors.toList
 
 /**
  * Represents a player with username, clan, country, friend/foe flag and so on.
@@ -70,8 +71,8 @@ class Player private constructor() {
         set(game: Game?) {
             this.gameProperty.set(game)
             if (game == null) {
-                status.unbind()
-                status.set(PlayerStatus.IDLE)
+                statusProperty.unbind()
+                statusProperty.value = PlayerStatus.IDLE
             } else {
                 this.statusProperty.bind(Bindings.createObjectBinding(Callable<PlayerStatus> {
                     if (game.status == GameStatus.OPEN) {
@@ -83,13 +84,12 @@ class Player private constructor() {
                         return@Callable PlayerStatus.IDLE
                     }
                     PlayerStatus.PLAYING
-                }, game.statusProperty()))
+                }, game.statusProperty))
             }
         }
 
     val statusProperty: ObjectProperty<PlayerStatus> = SimpleObjectProperty(PlayerStatus.IDLE)
-    val status: PlayerStatus
-        get() = statusProperty.get()
+    val status: PlayerStatus by statusProperty
 
     val numberOfGamesProperty: IntegerProperty = SimpleIntegerProperty()
     var numberOfGames: Int by numberOfGamesProperty
@@ -149,15 +149,15 @@ class Player private constructor() {
     companion object {
 
         fun fromDto(dto: com.faforever.client.api.dto.Player): Player {
-            val player = Player(dto.getLogin())
-            player.id = Integer.parseInt(dto.getId())
-            player.username = dto.getLogin()
-            player.globalRatingMean = Optional.ofNullable(dto.getGlobalRating()).map(Function<T, Any> { getMean() }).orElse(0.0).floatValue()
-            player.globalRatingDeviation = Optional.ofNullable(dto.getGlobalRating()).map(Function<T, Any> { getDeviation() }).orElse(0.0).floatValue()
-            player.leaderboardRatingMean = Optional.ofNullable(dto.getLadder1v1Rating()).map(Function<T, Any> { getMean() }).orElse(0.0).floatValue()
-            player.leaderboardRatingDeviation = Optional.ofNullable(dto.getLadder1v1Rating()).map(Function<T, Any> { getDeviation() }).orElse(0.0).floatValue()
-            if (dto.getNames() != null) {
-                player.names.addAll(dto.getNames().stream().map(???({ NameRecord.fromDto(it) })).collect(Collectors.toList<T>()))
+            val player = Player(dto.login)
+            player.id = Integer.parseInt(dto.id)
+            player.username = dto.login
+            player.globalRatingMean = Optional.ofNullable(dto.globalRating).map { it.mean }.orElse(0.0).floatValue()
+            player.globalRatingDeviation = Optional.ofNullable(dto.globalRating).map { it.deviation }.orElse(0.0).floatValue()
+            player.leaderboardRatingMean = Optional.ofNullable(dto.ladder1v1Rating).map { it.mean }.orElse(0.0).floatValue()
+            player.leaderboardRatingDeviation = Optional.ofNullable(dto.ladder1v1Rating).map { it.deviation() }.orElse(0.0).floatValue()
+            if (dto.names != null) {
+                player.names.addAll(dto.names.stream().map { NameRecord.fromDto(it) }.collect(toList()))
             }
             return player
         }
