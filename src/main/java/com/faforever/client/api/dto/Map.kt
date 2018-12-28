@@ -3,38 +3,30 @@ package com.faforever.client.api.dto
 import com.github.jasminb.jsonapi.annotations.Id
 import com.github.jasminb.jsonapi.annotations.Relationship
 import com.github.jasminb.jsonapi.annotations.Type
-import lombok.EqualsAndHashCode
-import lombok.Getter
-import lombok.Setter
 
 import java.time.OffsetDateTime
 
-@Getter
-@Setter
-@EqualsAndHashCode(of = "id")
 @Type("map")
-class Map {
+data class Map(@Id var id: String? = null) {
 
-    @Id
-    private val id: String? = null
-    private val battleType: String? = null
-    private val createTime: OffsetDateTime? = null
-    private val updateTime: OffsetDateTime? = null
-    private val displayName: String? = null
-    private val mapType: String? = null
+    var battleType: String? = null
+    var createTime: OffsetDateTime? = null
+    var updateTime: OffsetDateTime? = null
+    var displayName: String? = null
+    var mapType: String? = null
 
     @Relationship("author")
-    private val author: Player? = null
+    var author: Player? = null
 
     @Relationship("statistics")
-    private val statistics: MapStatistics? = null
+    var statistics: MapStatistics? = null
 
     @Relationship("latestVersion")
-    private val latestVersion: MapVersion? = null
+    var latestVersion: MapVersion? = null
 
     @Relationship("versions")
-    private val versions: List<MapVersion>? = null
+    var versions: List<MapVersion>? = null
 
     @Relationship("reviewsSummary")
-    private val mapVersionReviewsSummary: MapVersionReviewsSummary? = null
+    var mapVersionReviewsSummary: MapVersionReviewsSummary? = null
 }

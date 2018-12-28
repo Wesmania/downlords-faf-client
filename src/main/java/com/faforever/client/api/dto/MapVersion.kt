@@ -3,44 +3,35 @@ package com.faforever.client.api.dto
 import com.github.jasminb.jsonapi.annotations.Id
 import com.github.jasminb.jsonapi.annotations.Relationship
 import com.github.jasminb.jsonapi.annotations.Type
-import lombok.EqualsAndHashCode
-import lombok.Getter
-import lombok.Setter
 import org.apache.maven.artifact.versioning.ComparableVersion
 
 import java.net.URL
 import java.time.OffsetDateTime
 
-@Getter
-@Setter
-@EqualsAndHashCode(of = "id")
 @Type("mapVersion")
-class MapVersion {
-
-    @Id
-    private val id: String? = null
-    private val description: String? = null
-    private val maxPlayers: Integer? = null
-    private val width: Integer? = null
-    private val height: Integer? = null
-    private val version: ComparableVersion? = null
-    private val folderName: String? = null
+data class MapVersion(@Id var id: String? = null) {
+    var description: String? = null
+    var maxPlayers: Integer? = null
+    var width: Integer? = null
+    var height: Integer? = null
+    var version: ComparableVersion? = null
+    var folderName: String? = null
     // TODO name consistently with folderName
-    private val filename: String? = null
-    private val ranked: Boolean? = null
-    private val hidden: Boolean? = null
-    private val createTime: OffsetDateTime? = null
-    private val updateTime: OffsetDateTime? = null
-    private val thumbnailUrlSmall: URL? = null
-    private val thumbnailUrlLarge: URL? = null
-    private val downloadUrl: URL? = null
+    var filename: String? = null
+    var ranked: Boolean? = null
+    var hidden: Boolean? = null
+    var createTime: OffsetDateTime? = null
+    var updateTime: OffsetDateTime? = null
+    var thumbnailUrlSmall: URL? = null
+    var thumbnailUrlLarge: URL? = null
+    var downloadUrl: URL? = null
 
     @Relationship("map")
-    private val map: Map? = null
+    var map: Map? = null
 
     @Relationship("statistics")
-    private val statistics: MapVersionStatistics? = null
+    var statistics: MapVersionStatistics? = null
 
     @Relationship("reviews")
-    private val reviews: List<MapVersionReview>? = null
+    var reviews: List<MapVersionReview>? = null
 }

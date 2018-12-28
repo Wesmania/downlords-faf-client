@@ -4,21 +4,18 @@ package com.faforever.client.api.dto
 import com.github.jasminb.jsonapi.annotations.Id
 import com.github.jasminb.jsonapi.annotations.Relationship
 import com.github.jasminb.jsonapi.annotations.Type
-import lombok.Data
 
 import java.time.Instant
 
-@Data
 @Type("playerAchievement")
-class PlayerAchievement {
-
+data class PlayerAchievement (
     @Id
-    private val id: String? = null
-    private val state: AchievementState? = null
-    private val currentSteps: Integer? = null
-    private val createTime: Instant? = null
-    private val updateTime: Instant? = null
+    var id: String? = null,
+    var state: AchievementState? = null,
+    var currentSteps: Integer? = null,
+    var createTime: Instant? = null,
+    var updateTime: Instant? = null,
 
     @Relationship("achievement")
-    private val achievement: AchievementDefinition? = null
-}
+    var achievement: AchievementDefinition? = null
+)

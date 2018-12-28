@@ -7,11 +7,9 @@ import java.util.stream.Collectors
 class ApiException(private val errors: List<Error>) : RuntimeException() {
 
     // TODO localize
-    val localizedMessage: String
-        @Override
-        get() {
+    override fun getLocalizedMessage(): String {
             return errors.stream()
-                    .map({ Error.getDetail() })
+                    .map { it.detail }
                     .collect(Collectors.joining("\n"))
         }
 }
