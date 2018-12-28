@@ -11,8 +11,8 @@ import java.time.Instant
 data class PlayerAchievement (
     @Id
     var id: String? = null,
-    var state: AchievementState? = null,
-    var currentSteps: Integer? = null,
+    var state: AchievementState,
+    var currentSteps: Int? = null,
     var createTime: Instant? = null,
     var updateTime: Instant? = null,
 

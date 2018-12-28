@@ -9,7 +9,7 @@ data class GlobalLeaderboardEntry(@Id var id: String? = null) {
     var rank: Int = 0
     var mean: Double? = null
     var deviation: Double? = null
-    var numGames: Integer? = null
+    var numGames: Int? = null
     var isActive: Boolean? = null
     var rating: Double? = null
 }

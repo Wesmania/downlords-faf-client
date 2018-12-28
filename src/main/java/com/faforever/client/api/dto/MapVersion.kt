@@ -11,9 +11,9 @@ import java.time.OffsetDateTime
 @Type("mapVersion")
 data class MapVersion(@Id var id: String? = null) {
     var description: String? = null
-    var maxPlayers: Integer? = null
-    var width: Integer? = null
-    var height: Integer? = null
+    var maxPlayers: Int? = null
+    var width: Int? = null
+    var height: Int? = null
     var version: ComparableVersion? = null
     var folderName: String? = null
     // TODO name consistently with folderName

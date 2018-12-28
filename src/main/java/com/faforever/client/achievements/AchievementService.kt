@@ -55,8 +55,8 @@ constructor(private val fafService: FafService, private val playerService: Playe
     fun getImage(achievementDefinition: AchievementDefinition, achievementState: AchievementState): Image? {
         val url: URL
         when (achievementState) {
-            AchievementService.AchievementState.REVEALED -> url = noCatch<URL> { URL(achievementDefinition.getRevealedIconUrl()) }
-            AchievementService.AchievementState.UNLOCKED -> url = noCatch<URL> { URL(achievementDefinition.getUnlockedIconUrl()) }
+            AchievementService.AchievementState.REVEALED -> url = noCatch<URL> { URL(achievementDefinition.revealedIconUrl) }
+            AchievementService.AchievementState.UNLOCKED -> url = noCatch<URL> { URL(achievementDefinition.unlockedIconUrl) }
             else -> throw UnsupportedOperationException("Not yet implemented")
         }
         return assetService.loadAndCacheImage(url, Paths.get("achievements").resolve(achievementState.name.toLowerCase()),

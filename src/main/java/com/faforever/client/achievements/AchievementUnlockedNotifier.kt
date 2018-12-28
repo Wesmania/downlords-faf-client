@@ -31,7 +31,7 @@ constructor(private val notificationService: NotificationService, private val i1
 
     private fun onUpdatedAchievementsMessage(message: UpdatedAchievementsMessage) {
         message.updatedAchievements.stream()
-                .filter { it.getNewlyUnlocked() }
+                .filter { it.newlyUnlocked }
                 .forEachOrdered { updatedAchievement ->
                     achievementService.getAchievementDefinition(updatedAchievement.achievementId)
                             .thenAccept { this.notifyAboutUnlockedAchievement(it) }
@@ -49,7 +49,7 @@ constructor(private val notificationService: NotificationService, private val i1
         }
         notificationService.addNotification(TransientNotification(
                 i18n.get("achievement.unlockedTitle"),
-                achievementDefinition.getName(),
+                achievementDefinition.name ?: "",
                 achievementService.getImage(achievementDefinition, AchievementState.UNLOCKED)
         )
         )

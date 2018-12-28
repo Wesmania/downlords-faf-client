@@ -19,7 +19,6 @@ import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 
 import javax.inject.Inject
-import java.util.Objects
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -46,14 +45,14 @@ constructor(private val i18n: I18n, private val achievementService: AchievementS
     fun setAchievementDefinition(achievementDefinition: AchievementDefinition) {
         this.achievementDefinition = achievementDefinition
 
-        nameLabel.text = achievementDefinition.getName()
-        descriptionLabel.text = achievementDefinition.getDescription()
-        pointsLabel.text = i18n.number(achievementDefinition.getExperiencePoints())
+        nameLabel.text = achievementDefinition.name
+        descriptionLabel.text = achievementDefinition.description
+        pointsLabel.text = i18n.number(achievementDefinition.experiencePoints)
         imageView.image = achievementService.getImage(achievementDefinition, AchievementService.AchievementState.REVEALED)
-        progressLabel.text = i18n.get("achievement.stepsFormat", 0, achievementDefinition.getTotalSteps())
+        progressLabel.text = i18n.get("achievement.stepsFormat", 0, achievementDefinition.totalSteps as Any)
         progressBar.progress = 0.0
 
-        if (AchievementType.STANDARD === achievementDefinition.getType()) {
+        if (AchievementType.STANDARD === achievementDefinition.type) {
             progressBar.isVisible = false
             progressLabel.isVisible = false
         }
@@ -67,19 +66,19 @@ constructor(private val i18n: I18n, private val achievementService: AchievementS
     fun setPlayerAchievement(playerAchievement: PlayerAchievement) {
         var definition = achievementDefinition ?:
             throw IllegalStateException("achievementDefinition needs to be set first")
-        if (definition.getId() != playerAchievement.getAchievement().getId()) {
+        if (definition.id != playerAchievement.achievement?.id) {
             throw IllegalStateException("Achievement ID does not match")
         }
 
-        if (AchievementState.UNLOCKED == AchievementState.valueOf(playerAchievement.getState().name())) {
+        if (AchievementState.UNLOCKED == AchievementState.valueOf(playerAchievement.state.name)) {
             imageView.image = achievementService.getImage(definition, AchievementState.UNLOCKED)
             imageView.opacity = 1.0
             imageView.effect = null
         }
 
-        if (AchievementType.INCREMENTAL === definition.getType()) {
-            val currentSteps = MoreObjects.firstNonNull(playerAchievement.getCurrentSteps(), 0).toInt()
-            val totalSteps = definition.getTotalSteps()
+        if (AchievementType.INCREMENTAL === definition.type) {
+            val currentSteps = MoreObjects.firstNonNull(playerAchievement.currentSteps, 0)
+            val totalSteps = definition.totalSteps
             progressBar.progress = currentSteps.toDouble() / totalSteps!!
             Platform.runLater { progressLabel.text = i18n.get("achievement.stepsFormat", currentSteps, totalSteps) }
         }

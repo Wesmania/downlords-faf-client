@@ -11,25 +11,18 @@ import org.springframework.stereotype.Service
 import javax.annotation.PostConstruct
 import java.io.IOException
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.HashSet
 import java.util.LinkedHashSet
 import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import java.util.stream.Stream
 
 @Service
 class I18n(private val messageSource: ReloadableResourceBundleMessageSource, private val preferencesService: PreferencesService) {
-    private val availableLanguages: ObservableSet<Locale>
+    private val availableLanguages: ObservableSet<Locale> = FXCollections.observableSet(HashSet())
 
-    var userSpecificLocale: Locale? = null
-        private set
-
-    init {
-        availableLanguages = FXCollections.observableSet(HashSet())
-    }
+    private var userSpecificLocale: Locale? = null
 
     @PostConstruct
     @Throws(IOException::class)
@@ -66,7 +59,7 @@ class I18n(private val messageSource: ReloadableResourceBundleMessageSource, pri
         Files.list(languagesDirectory).use { dir ->
             dir
                     .map { path -> MESSAGES_FILE_PATTERN.matcher(path.toString()) }
-                    .filter(Predicate<Matcher> { it.matches() })
+                    .filter { it.matches() }
                     .forEach { matcher ->
                         newBaseNames.add(Paths.get(matcher.group(1)).toUri().toString())
                         availableLanguages.add(Locale(matcher.group(2), Strings.nullToEmpty(matcher.group(3))))
@@ -93,15 +86,15 @@ class I18n(private val messageSource: ReloadableResourceBundleMessageSource, pri
     }
 
     fun number(number: Int): String {
-        return String.format(userSpecificLocale, "%d", number)
+        return String.format(userSpecificLocale!!, "%d", number)
     }
 
     fun numberWithSign(number: Int): String {
-        return String.format(userSpecificLocale, "%+d", number)
+        return String.format(userSpecificLocale!!, "%+d", number)
     }
 
     fun rounded(number: Double, digits: Int): String {
-        return String.format(userSpecificLocale, "%." + digits + "f", number)
+        return String.format(userSpecificLocale!!, "%." + digits + "f", number)
     }
 
     fun getAvailableLanguages(): ReadOnlySetWrapper<Locale> {

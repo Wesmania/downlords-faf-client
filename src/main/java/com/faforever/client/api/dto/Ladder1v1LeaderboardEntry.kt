@@ -9,8 +9,8 @@ data class Ladder1v1LeaderboardEntry(@Id var id: String? = null) {
     var name: String? = null
     var mean: Double? = null
     var deviation: Double? = null
-    var numGames: Integer? = null
-    var wonGames: Integer? = null
+    var numGames: Int? = null
+    var wonGames: Int? = null
     var isActive: Boolean? = null
     var rating: Double? = null
 }
