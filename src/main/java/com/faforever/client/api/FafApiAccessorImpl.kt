@@ -24,19 +24,20 @@ import com.faforever.client.api.dto.PlayerEvent
 import com.faforever.client.api.dto.Tournament
 import com.faforever.client.config.CacheNames
 import com.faforever.client.config.ClientProperties
-import com.faforever.client.config.ClientProperties.Api
 import com.faforever.client.game.KnownFeaturedMod
 import com.faforever.client.io.CountingFileSystemResource
 import com.faforever.client.mod.FeaturedMod
 import com.faforever.client.user.event.LoggedOutEvent
 import com.faforever.client.user.event.LoginSuccessEvent
+import com.faforever.client.util.getForObject
+import com.faforever.client.util.mapToMultiMap
+import com.faforever.client.util.typeRef
 import com.faforever.client.vault.search.SearchController.SearchConfig
 import com.faforever.client.vault.search.SearchController.SortConfig
 import com.faforever.commons.io.ByteCountListener
 import com.github.rutledgepaulv.qbuilders.builders.QBuilder
 import com.github.rutledgepaulv.qbuilders.conditions.Condition
 import com.github.rutledgepaulv.qbuilders.visitors.RSQLVisitor
-import com.google.common.collect.ImmutableMap
 import com.google.common.eventbus.EventBus
 import com.google.common.eventbus.Subscribe
 import lombok.SneakyThrows
@@ -44,27 +45,21 @@ import lombok.extern.slf4j.Slf4j
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.context.annotation.Profile
-import org.springframework.http.ResponseEntity
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.security.oauth2.client.OAuth2RestTemplate
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails
 import org.springframework.security.oauth2.common.AuthenticationScheme
 import org.springframework.stereotype.Component
-import org.springframework.util.CollectionUtils
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestOperations
-import org.springframework.web.util.UriComponents
 import org.springframework.web.util.UriComponentsBuilder
 
 import javax.annotation.PostConstruct
 import javax.inject.Inject
 import java.io.Serializable
 import java.nio.file.Path
-import java.util.Arrays
-import java.util.Collections
 import java.util.LinkedList
-import kotlin.collections.Map.Entry
 import java.util.Optional
 import java.util.concurrent.CountDownLatch
 import java.util.stream.Collectors
@@ -77,81 +72,73 @@ constructor(private val eventBus: EventBus, restTemplateBuilder: RestTemplateBui
             private val clientProperties: ClientProperties, jsonApiMessageConverter: JsonApiMessageConverter,
             jsonApiErrorHandler: JsonApiErrorHandler) : FafApiAccessor {
     private val restTemplateBuilder: RestTemplateBuilder
-    private val requestFactory: HttpComponentsClientHttpRequestFactory
+    private val requestFactory: HttpComponentsClientHttpRequestFactory = HttpComponentsClientHttpRequestFactory()
 
-    private var authorizedLatch: CountDownLatch? = null
+    private var authorizedLatch: CountDownLatch = CountDownLatch(1)
     private var restOperations: RestOperations? = null
 
-    val achievementDefinitions: List<AchievementDefinition>
-        @Override
+    override val achievementDefinitions: List<AchievementDefinition>
         @SuppressWarnings("unchecked")
         @Cacheable(CacheNames.ACHIEVEMENTS)
-        get() = getAll("/data/achievement", ImmutableMap.of(
-                "sort", "order"
+        get() = getAll("/data/achievement", mapOf(
+                "sort" to "order"
         ))
 
-    val mods: List<Mod>
-        @Override
+    override val mods: List<Mod>
         @Cacheable(CacheNames.MODS)
-        get() = getAll("/data/mod", ImmutableMap.of(
-                "include", "latestVersion,latestVersion.reviewsSummary"))
+        get() = getAll("/data/mod", mapOf(
+                "include" to "latestVersion,latestVersion.reviewsSummary"))
 
-    val featuredMods: List<com.faforever.client.api.dto.FeaturedMod>
-        @Override
+    override val featuredMods: List<com.faforever.client.api.dto.FeaturedMod>
         @Cacheable(CacheNames.FEATURED_MODS)
-        get() = getMany("/data/featuredMod", 1000, ImmutableMap.of())
+        get() = getMany("/data/featuredMod", 1000, emptyMap())
 
     // This is not an ordinary JSON-API route and thus doesn't support paging, that's why it's called manually
-    val globalLeaderboard: List<GlobalLeaderboardEntry>
-        @Override
+    override val globalLeaderboard: List<GlobalLeaderboardEntry>
         @Cacheable(CacheNames.GLOBAL_LEADERBOARD)
         @SneakyThrows
         @SuppressWarnings("unchecked")
         get() {
-            authorizedLatch!!.await()
-            return restOperations!!.getForObject("/leaderboards/global", List::class.java,
-                    ImmutableMap.of(
-                            "sort", "-rating",
-                            "include", "player",
-                            "fields[globalRating]", "rating,numGames",
-                            "fields[player]", "login"
-                    ))
+            authorizedLatch.await()
+            return restOperations!!.getForObject("/leaderboards/global",
+                    mapOf(
+                            "sort" to "-rating",
+                            "include" to "player",
+                            "fields[globalRating]" to "rating,numGames",
+                            "fields[player]" to "login"
+                    ), typeRef<List<GlobalLeaderboardEntry>>()) ?: emptyList()
         }
 
     // This is not an ordinary JSON-API route and thus doesn't support paging, that's why it doesn't use getAll()
-    val ladder1v1Leaderboard: List<Ladder1v1LeaderboardEntry>
-        @Override
+    override val ladder1v1Leaderboard: List<Ladder1v1LeaderboardEntry>
         @Cacheable(CacheNames.LADDER_1V1_LEADERBOARD)
         @SneakyThrows
         @SuppressWarnings("unchecked")
         get() {
-            authorizedLatch!!.await()
-            return restOperations!!.getForObject("/leaderboards/ladder1v1", List::class.java,
-                    ImmutableMap.of(
-                            "sort", "-rating",
-                            "include", "player",
-                            "fields[ladder1v1Rating]", "rating,numGames,winGames",
-                            "fields[player]", "login"
-                    ))
+            authorizedLatch.await()
+            return restOperations!!.getForObject("/leaderboards/ladder1v1",
+                    mapOf(
+                            "sort" to "-rating",
+                            "include" to "player",
+                            "fields[ladder1v1Rating]" to "rating,numGames,winGames",
+                            "fields[player]" to "login"
+                    ), typeRef<List<Ladder1v1LeaderboardEntry>>()) ?: emptyList()
         }
 
-    val coopMissions: List<CoopMission>
+    override val coopMissions: List<CoopMission>
         @Override
         @Cacheable(CacheNames.COOP_MAPS)
-        get() = this.getAll<Object>("/data/coopMission")
+        get() = this.getAll("/data/coopMission")
 
-    val allTournaments: List<Tournament>
+    override val allTournaments: List<Tournament>
         @Override
         @SneakyThrows
         @SuppressWarnings("unchecked")
-        get() = Arrays.asList(restOperations!!.getForObject(TOURNAMENT_LIST_ENDPOINT, Array<Tournament>::class.java))
+        get() = restOperations!!.getForObject(TOURNAMENT_LIST_ENDPOINT, typeRef<List<Tournament>>()) ?: emptyList()
 
     init {
-        authorizedLatch = CountDownLatch(1)
-
-        requestFactory = HttpComponentsClientHttpRequestFactory()
         this.restTemplateBuilder = restTemplateBuilder
-                .requestFactory({ requestFactory })
+                .requestFactory { requestFactory }
                 .additionalMessageConverters(jsonApiMessageConverter)
                 .errorHandler(jsonApiErrorHandler)
     }
@@ -172,317 +159,279 @@ constructor(private val eventBus: EventBus, restTemplateBuilder: RestTemplateBui
         authorize(event.userId, event.username, event.password)
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    fun getPlayerAchievements(playerId: Int): List<PlayerAchievement> {
-        return getAll("/data/playerAchievement", ImmutableMap.of(
-                "filter", rsql(qBuilder<QBuilder<T>>().intNum("player.id").eq(playerId))
+    override fun getPlayerAchievements(playerId: Int): List<PlayerAchievement> {
+        return getAll("/data/playerAchievement", mapOf(
+                "filter" to rsql(qBuilder().intNum("player.id").eq(playerId))
         ))
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    fun getPlayerEvents(playerId: Int): List<PlayerEvent> {
-        return getAll("/data/playerEvent", ImmutableMap.of(
-                "filter", rsql(qBuilder<QBuilder<T>>().intNum("player.id").eq(playerId))
+    override fun getPlayerEvents(playerId: Int): List<PlayerEvent> {
+        return getAll("/data/playerEvent", mapOf(
+                "filter" to rsql(qBuilder().intNum("player.id").eq(playerId))
         ))
     }
 
-    @Override
     @Cacheable(CacheNames.ACHIEVEMENTS)
-    fun getAchievementDefinition(achievementId: String): AchievementDefinition {
-        return getOne("/data/achievement/$achievementId", AchievementDefinition::class.java)
+    override fun getAchievementDefinition(achievementId: String): AchievementDefinition? {
+        return getOne("/data/achievement/$achievementId")
     }
 
-    @Override
-    fun getLadder1v1EntryForPlayer(playerId: Int): Ladder1v1LeaderboardEntry {
-        return getOne("/leaderboards/ladder1v1/$playerId", Ladder1v1LeaderboardEntry::class.java)
+    override fun getLadder1v1EntryForPlayer(playerId: Int): Ladder1v1LeaderboardEntry? {
+        return getOne("/leaderboards/ladder1v1/$playerId")
     }
 
-    @Override
     @Cacheable(CacheNames.RATING_HISTORY)
-    fun getGamePlayerStats(playerId: Int, knownFeaturedMod: KnownFeaturedMod): List<GamePlayerStats> {
-        return getAll("/data/gamePlayerStats", ImmutableMap.of(
-                "filter", rsql(qBuilder<QBuilder<T>>()
+    override fun getGamePlayerStats(playerId: Int, knownFeaturedMod: KnownFeaturedMod): List<GamePlayerStats> {
+        return getAll("/data/gamePlayerStats", mapOf(
+                "filter" to rsql(qBuilder()
                 .intNum("player.id").eq(playerId)
                 .and()
                 .string("game.featuredMod.technicalName").eq(knownFeaturedMod.technicalName)
         )))
     }
 
-    @Override
     @Cacheable(CacheNames.MAPS)
-    fun getMostPlayedMaps(count: Int, page: Int): List<Map> {
-        return this.getPage<MapStatistics>("/data/mapStatistics", count, page, ImmutableMap.of(
-                "include", "map,map.statistics,map.latestVersion,map.author,map.versions.reviews,map.versions.reviews.player",
-                "sort", "-plays")).stream()
-                .map(???({ MapStatistics.getMap() }))
+    override fun getMostPlayedMaps(count: Int, page: Int): List<Map> {
+        return this.getPage<MapStatistics>("/data/mapStatistics", count, page, mapOf(
+                "include" to "map,map.statistics,map.latestVersion,map.author,map.versions.reviews,map.versions.reviews.player",
+                "sort" to "-plays")).stream()
+                .map { it.map!! } /* FIXME */
         .collect(Collectors.toList())
     }
 
-    @Override
-    fun getHighestRatedMaps(count: Int, page: Int): List<Map> {
-        return this.getPage<MapStatistics>("/data/mapStatistics", count, page, ImmutableMap.of(
-                "include", "map.statistics,map,map.latestVersion,map.author,map.versions.reviews,map.versions.reviews.player,map.latestVersion.reviewsSummary",
-                "sort", "-map.latestVersion.reviewsSummary.lowerBound")).stream()
-                .map(???({ MapStatistics.getMap() }))
+    override fun getHighestRatedMaps(count: Int, page: Int): List<Map> {
+        return this.getPage<MapStatistics>("/data/mapStatistics", count, page, mapOf(
+                "include" to "map.statistics,map,map.latestVersion,map.author,map.versions.reviews,map.versions.reviews.player,map.latestVersion.reviewsSummary",
+                "sort" to "-map.latestVersion.reviewsSummary.lowerBound")).stream()
+                .map { it.map!!}    /* FIXME */
         .collect(Collectors.toList())
     }
 
-    @Override
-    fun getNewestMaps(count: Int, page: Int): List<Map> {
-        return getPage(MAP_ENDPOINT, count, page, ImmutableMap.of(
-                "include", "statistics,latestVersion,author,versions.reviews,versions.reviews.player",
-                "sort", "-updateTime"))
+    override fun getNewestMaps(count: Int, page: Int): List<Map> {
+        return getPage(MAP_ENDPOINT, count, page, mapOf(
+                "include" to "statistics,latestVersion,author,versions.reviews,versions.reviews.player",
+                "sort" to "-updateTime"))
     }
 
-    @Override
-    fun getLastGamesOnMap(playerId: Int, mapVersionId: String, count: Int): List<Game> {
-        return getMany("/data/game", count, ImmutableMap.of(
-                "filter", rsql(qBuilder<QBuilder<T>>()
+    override fun getLastGamesOnMap(playerId: Int, mapVersionId: String, count: Int): List<Game> {
+        return getMany("/data/game", count, mapOf(
+                "filter" to rsql(qBuilder()
                 .string("mapVersion.id").eq(mapVersionId)
                 .and()
                 .intNum("playerStats.player.id").eq(playerId)),
-                "sort", "-endTime"
+                "sort" to "-endTime"
         ))
     }
 
-    @Override
-    fun uploadMod(file: Path, listener: ByteCountListener) {
+    override fun uploadMod(file: Path, listener: ByteCountListener) {
         val multipartContent = createFileMultipart(file, listener)
         post("/mods/upload", multipartContent, false)
     }
 
-    @Override
-    fun uploadMap(file: Path, isRanked: Boolean, listener: ByteCountListener) {
+    override fun uploadMap(file: Path, isRanked: Boolean, listener: ByteCountListener) {
         val multipartContent = createFileMultipart(file, listener)
-        multipartContent.add("metadata", ImmutableMap.of("isRanked", isRanked))
+        multipartContent.add("metadata", mapOf("isRanked" to isRanked))
         post("/maps/upload", multipartContent, false)
     }
 
-    @Override
-    fun changePassword(username: String, currentPasswordHash: String, newPasswordHash: String) {
-        val body = ImmutableMap.of(
-                "currentPassword", currentPasswordHash,
-                "newPassword", newPasswordHash
+    override fun changePassword(username: String, currentPasswordHash: String, newPasswordHash: String) {
+        val body = mapOf(
+                "currentPassword" to currentPasswordHash,
+                "newPassword" to newPasswordHash
         )
-
         post("/users/changePassword", body, true)
     }
 
-    @Override
-    fun getModVersion(uid: String): ModVersion {
-        return getMany("/data/modVersion", 1,
-                ImmutableMap.of("filter", rsql(qBuilder<QBuilder<T>>().string("uid").eq(uid)), "include", "mod,mod.latestVersion,mod.versions,mod.uploader")
-        ).get(0) as ModVersion
+    override fun getModVersion(uid: String): ModVersion {
+        val versions: List<ModVersion> = getMany("/data/modVersion", 1,
+                mapOf("filter" to rsql(qBuilder().string("uid").eq(uid)),
+                      "include" to "mod,mod.latestVersion,mod.versions,mod.uploader")
+        )
+        return versions[0]
     }
 
-    @Override
     @Cacheable(CacheNames.FEATURED_MOD_FILES)
-    fun getFeaturedModFiles(featuredMod: FeaturedMod, version: Integer): List<FeaturedModFile> {
+    override fun getFeaturedModFiles(featuredMod: FeaturedMod, version: Int): List<FeaturedModFile> {
         val endpoint = String.format("/featuredMods/%s/files/%s", featuredMod.getId(),
-                Optional.ofNullable(version).map(???({ String.valueOf() })).orElse("latest"))
-        return getMany(endpoint, 10000, ImmutableMap.of())
+                Optional.ofNullable(version).map { it.toString() }.orElse("latest"))
+        return getMany(endpoint, 10000, emptyMap())
     }
 
-    @Override
-    fun getNewestReplays(count: Int, page: Int): List<Game> {
-        return getPage("/data/game", count, page, ImmutableMap.of(
-                "sort", "-endTime",
-                "include", REPLAY_INCLUDES,
-                "filter", "endTime=isnull=false"
+    override fun getNewestReplays(count: Int, page: Int): List<Game> {
+        return getPage("/data/game", count, page, mapOf(
+                "sort" to "-endTime",
+                "include" to REPLAY_INCLUDES,
+                "filter" to "endTime=isnull=false"
         ))
     }
 
-    @Override
-    fun getHighestRatedReplays(count: Int, page: Int): List<Game> {
-        return getPage("/data/game", count, page, ImmutableMap.of(
-                "sort", "-reviewsSummary.lowerBound",
-                "include", REPLAY_INCLUDES,
-                "filter", "endTime=isnull=false"
+    override fun getHighestRatedReplays(count: Int, page: Int): List<Game> {
+        return getPage("/data/game", count, page, mapOf(
+                "sort" to "-reviewsSummary.lowerBound",
+                "include" to REPLAY_INCLUDES,
+                "filter" to "endTime=isnull=false"
         ))
     }
 
-    @Override
-    fun findReplaysByQuery(query: String, maxResults: Int, page: Int, sortConfig: SortConfig): List<Game> {
-        return getPage("/data/game", maxResults, page, ImmutableMap.of(
-                "filter", "($query);endTime=isnull=false",
-                "include", REPLAY_INCLUDES,
-                "sort", sortConfig.toQuery()
+    override fun findReplaysByQuery(query: String, maxResults: Int, page: Int, sortConfig: SortConfig): List<Game> {
+        return getPage("/data/game", maxResults, page, mapOf(
+                "filter" to "($query);endTime=isnull=false",
+                "include" to REPLAY_INCLUDES,
+                "sort" to sortConfig.toQuery()
         ))
     }
 
-    @Override
-    fun findMapByFolderName(folderName: String): Optional<MapVersion> {
-        val maps = getMany("/data/mapVersion", 1, ImmutableMap.of(
-                "filter", String.format("filename==\"*%s*\"", folderName),
-                "include", "map,map.statistics,reviews"))
+    override fun findMapByFolderName(folderName: String): Optional<MapVersion> {
+        val maps: List<MapVersion> = getMany("/data/mapVersion", 1, mapOf(
+                "filter" to String.format("filename==\"*%s*\"", folderName),
+                "include" to "map,map.statistics,reviews"))
         return if (maps.isEmpty()) {
             Optional.empty()
-        } else Optional.ofNullable(maps.get(0))
+        } else Optional.ofNullable(maps[0])
     }
 
-    @Override
-    fun getPlayersByIds(playerIds: Collection<Integer>): List<Player> {
-        val ids = playerIds.stream().map(???({ String.valueOf() })).collect(Collectors.toList())
+    override fun getPlayersByIds(playerIds: Collection<Int>): List<Player> {
+        val ids = playerIds.stream().map { it.toString() }.collect(Collectors.toList())
 
-        return getMany("/data/player", playerIds.size(), ImmutableMap.of(
-                "include", PLAYER_INCLUDES,
-                "filter", rsql(qBuilder<QBuilder<T>>().string("id").`in`(ids))
+        return getMany("/data/player", playerIds.size, mapOf(
+                "include" to PLAYER_INCLUDES,
+                "filter" to rsql(qBuilder().string("id").`in`(ids))
         ))
     }
 
-    @Override
-    fun createGameReview(review: GameReview): GameReview {
-        return post("/data/game/" + review.getGame().getId() + "/reviews", review, GameReview::class.java)
+    override fun createGameReview(review: GameReview): GameReview? {
+        return post("/data/game/" + review.game.id + "/reviews", review, GameReview::class.java)
     }
 
-    @Override
-    fun updateGameReview(review: GameReview) {
-        patch("/data/gameReview/" + review.getId(), review, Void::class.java)
+    override fun updateGameReview(review: GameReview) {
+        patch("/data/gameReview/" + review.id, review, Void::class.java)
     }
 
-    @Override
-    fun createModVersionReview(review: ModVersionReview): ModVersionReview {
-        return post("/data/modVersion/" + review.getModVersion().getId() + "/reviews", review, ModVersionReview::class.java)
+    override fun createModVersionReview(review: ModVersionReview): ModVersionReview? {
+        return post("/data/modVersion/" + review.modVersion.id + "/reviews", review, ModVersionReview::class.java)
     }
 
-    @Override
-    fun updateModVersionReview(review: ModVersionReview) {
-        patch("/data/modVersionReview/" + review.getId(), review, Void::class.java)
+    override fun updateModVersionReview(review: ModVersionReview) {
+        patch("/data/modVersionReview/" + review.id, review, Void::class.java)
     }
 
-    @Override
-    fun createMapVersionReview(review: MapVersionReview): MapVersionReview {
-        return post("/data/mapVersion/" + review.getMapVersion().getId() + "/reviews", review, MapVersionReview::class.java)
+    override fun createMapVersionReview(review: MapVersionReview): MapVersionReview? {
+        return post("/data/mapVersion/" + review.mapVersion.id + "/reviews", review, MapVersionReview::class.java)
     }
 
-    @Override
-    fun updateMapVersionReview(review: MapVersionReview) {
-        patch("/data/mapVersionReview/" + review.getId(), review, Void::class.java)
+    override fun updateMapVersionReview(review: MapVersionReview) {
+        patch("/data/mapVersionReview/" + review.id, review, Void::class.java)
     }
 
-    @Override
-    fun deleteGameReview(id: String) {
+    override fun deleteGameReview(id: String) {
         delete("/data/gameReview/$id")
     }
 
-    @Override
-    fun deleteMapVersionReview(id: String) {
+    override fun deleteMapVersionReview(id: String) {
         delete("/data/mapVersionReview/$id")
     }
 
-    @Override
-    fun findModsByQuery(searchConfig: SearchConfig, page: Int, count: Int): List<Mod> {
-        val parameterMap = LinkedMultiValueMap()
-        if (searchConfig.hasQuery()) {
-            parameterMap.add("filter", searchConfig.getSearchQuery() + ";latestVersion.hidden==\"false\"")
+    override fun findModsByQuery(query: SearchConfig, page: Int, maxResults: Int): List<Mod> {
+        val parameterMap: MultiValueMap<String, String> = LinkedMultiValueMap()
+        if (query.hasQuery()) {
+            parameterMap.add("filter", query.searchQuery + ";latestVersion.hidden==\"false\"")
         }
         parameterMap.add("include", "latestVersion,latestVersion.reviews,latestVersion.reviews.player,latestVersion.reviewsSummary")
-        parameterMap.add("sort", searchConfig.getSortConfig().toQuery())
-        return getPage<Object>(MOD_ENDPOINT, count, page, parameterMap)
+        parameterMap.add("sort", query.sortConfig.toQuery())
+        return getPage(MOD_ENDPOINT, maxResults, page, parameterMap)
     }
 
-    @Override
-    fun deleteModVersionReview(id: String) {
+    override fun deleteModVersionReview(id: String) {
         delete("/data/modVersionReview/$id")
     }
 
-    @Override
-    fun findReplayById(id: Int): Optional<Game> {
-        return Optional.ofNullable(getOne("/data/game/$id", Game::class.java, ImmutableMap.of("include", REPLAY_INCLUDES)))
+    override fun findReplayById(id: Int): Optional<Game> {
+        return Optional.ofNullable(getOne("/data/game/$id", mapOf("include" to REPLAY_INCLUDES)))
     }
 
-    @Override
-    fun getLadder1v1Maps(count: Int, page: Int): List<Ladder1v1Map> {
-        return getPage("/data/ladder1v1Map", count, page, ImmutableMap.of(
-                "include", "mapVersion,mapVersion.map,mapVersion.map.latestVersion,mapVersion.map.latestVersion.reviews,mapVersion.map.author,mapVersion.map.statistics"))
+    override fun getLadder1v1Maps(count: Int, page: Int): List<Ladder1v1Map> {
+        return getPage("/data/ladder1v1Map", count, page, mapOf(
+                "include" to "mapVersion,mapVersion.map,mapVersion.map.latestVersion,mapVersion.map.latestVersion.reviews,mapVersion.map.author,mapVersion.map.statistics"))
     }
 
-    @Override
-    fun getOwnedMaps(playerId: Int, loadMoreCount: Int, page: Int): List<MapVersion> {
-        return getPage("/data/mapVersion", loadMoreCount, page, ImmutableMap.of(
-                "include", "map,map.latestVersion,map.latestVersion.reviews,map.author,map.statistics",
-                "filter", rsql(qBuilder<QBuilder<T>>().string("map.author.id").eq(String.valueOf(playerId)))
+    override fun getOwnedMaps(playerId: Int, loadMoreCount: Int, page: Int): List<MapVersion> {
+        return getPage("/data/mapVersion", loadMoreCount, page, mapOf(
+                "include" to "map,map.latestVersion,map.latestVersion.reviews,map.author,map.statistics",
+                "filter" to rsql(qBuilder().string("map.author.id").eq(playerId.toString()))
         ))
     }
 
-    @Override
-    fun updateMapVersion(id: String, mapVersion: MapVersion) {
+    override fun updateMapVersion(id: String, mapVersion: MapVersion) {
         patch(String.format("/data/mapVersion/%s", id), mapVersion, Void::class.java)
     }
 
-    @Override
     @Cacheable(CacheNames.CLAN)
-    fun getClanByTag(tag: String): Optional<Clan> {
-        val clans = getMany("/data/clan", 1, ImmutableMap.of(
-                "include", "leader,founder,memberships,memberships.player",
-                "filter", rsql(qBuilder<QBuilder<T>>().string("tag").eq(tag))
+    override fun getClanByTag(tag: String): Optional<Clan> {
+        val clans: List<Clan> = getMany("/data/clan", 1, mapOf(
+                "include" to "leader,founder,memberships,memberships.player",
+                "filter" to rsql(qBuilder().string("tag").eq(tag))
         ))
         return if (clans.isEmpty()) {
             Optional.empty()
-        } else Optional.ofNullable(clans.get(0))
+        } else Optional.ofNullable(clans[0])
     }
 
-    @Override
-    fun findMapsByQuery(searchConfig: SearchConfig, page: Int, count: Int): List<Map> {
-        val parameterMap = LinkedMultiValueMap()
+    override fun findMapsByQuery(searchConfig: SearchConfig, page: Int, count: Int): List<Map> {
+        val parameterMap: MultiValueMap<String, String> = LinkedMultiValueMap()
         if (searchConfig.hasQuery()) {
-            parameterMap.add("filter", searchConfig.getSearchQuery() + ";latestVersion.hidden==\"false\"")
+            parameterMap.add("filter", searchConfig.searchQuery + ";latestVersion.hidden==\"false\"")
         }
         parameterMap.add("include", "latestVersion,latestVersion.reviews,latestVersion.reviews.player,author,statistics,latestVersion.reviewsSummary")
-        parameterMap.add("sort", searchConfig.getSortConfig().toQuery())
-        return getPage<Object>(MAP_ENDPOINT, count, page, parameterMap)
+        parameterMap.add("sort", searchConfig.sortConfig.toQuery())
+        return getPage(MAP_ENDPOINT, count, page, parameterMap)
     }
 
-    @Override
-    fun findMapVersionById(id: String): Optional<MapVersion> {
+    override fun findMapVersionById(id: String): Optional<MapVersion> {
         // FIXME: that is not gonna work this way
-        return Optional.ofNullable(getOne("$MAP_ENDPOINT/$id", MapVersion::class.java))
+        return Optional.ofNullable(getOne("$MAP_ENDPOINT/$id"))
     }
 
-    @Override
     @Cacheable(CacheNames.COOP_LEADERBOARD)
-    fun getCoopLeaderboard(missionId: String, numberOfPlayers: Int): List<CoopResult> {
-        return getMany("/data/coopResult", 1000, ImmutableMap.of(
-                "filter", rsql(qBuilder<QBuilder<T>>().intNum("playerCount").eq(numberOfPlayers)
+    override fun getCoopLeaderboard(missionId: String, numberOfPlayers: Int): List<CoopResult> {
+        return getMany("/data/coopResult", 1000, mapOf(
+                "filter" to rsql(qBuilder().intNum("playerCount").eq(numberOfPlayers)
                 .and().string("mission").eq(missionId)),
-                "include", COOP_RESULT_INCLUDES,
-                "sort", "duration"
+                "include" to COOP_RESULT_INCLUDES,
+                "sort" to "duration"
         ))
     }
 
-    @Override
     @SneakyThrows
-    fun authorize(playerId: Int, username: String, password: String) {
-        val apiProperties = clientProperties.getApi()
+    override fun authorize(playerId: Int, username: String, password: String) {
+        val apiProperties = clientProperties.api
 
         val details = ResourceOwnerPasswordResourceDetails()
-        details.setClientId(apiProperties.getClientId())
-        details.setClientSecret(apiProperties.getClientSecret())
-        details.setClientAuthenticationScheme(AuthenticationScheme.header)
-        details.setAccessTokenUri(apiProperties.getBaseUrl() + OAUTH_TOKEN_PATH)
-        details.setUsername(username)
-        details.setPassword(password)
+        details.clientId = apiProperties.clientId
+        details.clientSecret = apiProperties.clientSecret
+        details.clientAuthenticationScheme = AuthenticationScheme.header
+        details.accessTokenUri = apiProperties.baseUrl + OAUTH_TOKEN_PATH
+        details.username = username
+        details.password = password
 
         restOperations = restTemplateBuilder
                 // Base URL can be changed in login window
-                .rootUri(apiProperties.getBaseUrl())
+                .rootUri(apiProperties.baseUrl)
                 .configure(OAuth2RestTemplate(details))
 
-        authorizedLatch!!.countDown()
+        authorizedLatch.countDown()
     }
 
-    @NotNull
-    private fun createFileMultipart(file: Path, listener: ByteCountListener): MultiValueMap<String, Object> {
-        val form = LinkedMultiValueMap()
+    private fun createFileMultipart(file: Path, listener: ByteCountListener): MultiValueMap<String, Any> {
+        val form: MultiValueMap<String, Any> = LinkedMultiValueMap()
         form.add("file", CountingFileSystemResource(file, listener))
         return form
     }
 
     @SneakyThrows
-    private fun post(endpointPath: String, request: Object, bufferRequestBody: Boolean) {
-        authorizedLatch!!.await()
+    private fun post(endpointPath: String, request: Any, bufferRequestBody: Boolean) {
+        authorizedLatch.await()
         requestFactory.setBufferRequestBody(bufferRequestBody)
 
         try {
@@ -494,15 +443,15 @@ constructor(private val eventBus: EventBus, restTemplateBuilder: RestTemplateBui
     }
 
     @SneakyThrows
-    private fun <T> post(endpointPath: String, request: Object, type: Class<T>): T {
-        authorizedLatch!!.await()
+    private fun <T> post(endpointPath: String, request: Any, type: Class<T>): T? {
+        authorizedLatch.await()
         val entity = restOperations!!.postForEntity(endpointPath, request, type)
-        return entity.getBody()
+        return entity.body
     }
 
     @SneakyThrows
-    private fun <T> patch(endpointPath: String, request: Object, type: Class<T>): T {
-        authorizedLatch!!.await()
+    private fun <T> patch(endpointPath: String, request: Any, type: Class<T>): T? {
+        authorizedLatch.await()
         return restOperations!!.patchForObject(endpointPath, request, type)
     }
 
@@ -512,46 +461,41 @@ constructor(private val eventBus: EventBus, restTemplateBuilder: RestTemplateBui
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    private fun <T> getOne(endpointPath: String, type: Class<T>): T {
-        return restOperations!!.getForObject(endpointPath, type, Collections.emptyMap())
+    private inline fun <reified T: Any> getOne(endpointPath: String): T? {
+        return restOperations!!.getForObject(endpointPath, typeRef<T>())
     }
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    private fun <T> getOne(endpointPath: String, type: Class<T>, params: java.util.Map<String, Serializable>): T {
-        val multiValues = params.entrySet().stream()
-                .collect(Collectors.toMap(???({ Entry.getKey() }), { entry -> Collections.singletonList(String.valueOf(entry.getValue())) }))
-
+    private inline fun <reified T: Any> getOne(endpointPath: String, params: kotlin.collections.Map<String, Serializable>): T? {
+        val multiValues = mapToMultiMap(params.mapValues { it.toString() })
         val uriComponents = UriComponentsBuilder.fromPath(endpointPath)
-                .queryParams(CollectionUtils.toMultiValueMap(multiValues))
+                .queryParams(multiValues)
                 .build()
-
-        authorizedLatch!!.await()
-        return getOne(uriComponents.toUriString(), type)
+        authorizedLatch.await()
+        return getOne(uriComponents.toUriString())
     }
 
-    private fun <T> getAll(endpointPath: String, params: java.util.Map<String, Serializable> = Collections.emptyMap()): List<T> {
-        return getMany(endpointPath, clientProperties.getApi().getMaxPageSize(), params)
+    private fun <T> getAll(endpointPath: String, params: kotlin.collections.Map<String, Serializable> = emptyMap()): List<T> {
+        return getMany(endpointPath, clientProperties.api.maxPageSize, params)
     }
 
     @SneakyThrows
-    private fun <T> getMany(endpointPath: String, count: Int, params: java.util.Map<String, Serializable>): List<T> {
-        val result = LinkedList()
+    private fun <T> getMany(endpointPath: String, count: Int, params: kotlin.collections.Map<String, Serializable>): List<T> {
+        val result = LinkedList<T>()
         var current: List<T>? = null
         var page = 1
-        val maxPageSize = clientProperties.getApi().getMaxPageSize()
-        while ((current == null || current.size() >= maxPageSize) && result.size() < count) {
-            current = getPage<Object>(endpointPath, count, page++, params)
+        val maxPageSize = clientProperties.api.maxPageSize
+        while ((current == null || current.size>= maxPageSize) && result.size < count) {
+            current = getPage(endpointPath, count, page++, params)
             result.addAll(current)
         }
         return result
     }
 
-    private fun <T> getPage(endpointPath: String, pageSize: Int, page: Int, params: java.util.Map<String, Serializable>): List<T> {
-        val multiValues = params.entrySet().stream()
-                .collect(Collectors.toMap(???({ Entry.getKey() }), { entry -> Collections.singletonList(String.valueOf(entry.getValue())) }))
-
-        return getPage(endpointPath, pageSize, page, CollectionUtils.toMultiValueMap(multiValues))
+    private fun <T> getPage(endpointPath: String, pageSize: Int, page: Int, params: kotlin.collections.Map<String, Serializable>): List<T> {
+        val multiValues = mapToMultiMap(params.mapValues { it.toString() })
+        return getPage(endpointPath, pageSize, page, multiValues)
     }
 
     @SuppressWarnings("unchecked")
@@ -563,26 +507,25 @@ constructor(private val eventBus: EventBus, restTemplateBuilder: RestTemplateBui
                 .replaceQueryParam("page[number]", page)
                 .build()
 
-        authorizedLatch!!.await()
-        return restOperations!!.getForObject(uriComponents.toUriString(), List::class.java)
+        authorizedLatch.await()
+        return restOperations!!.getForObject(uriComponents.toUriString(), typeRef<List<T>>()) ?: emptyList()
     }
+
+    private class qBuilder : QBuilder<qBuilder>(){}
 
     companion object {
 
-        private val MAP_ENDPOINT = "/data/map"
-        private val TOURNAMENT_LIST_ENDPOINT = "/challonge/v1/tournaments.json"
-        private val REPLAY_INCLUDES = "featuredMod,playerStats,playerStats.player,reviews,reviews.player,mapVersion,mapVersion.map,mapVersion.reviews,reviewsSummary"
-        private val COOP_RESULT_INCLUDES = "game.playerStats.player"
-        private val PLAYER_INCLUDES = "globalRating,ladder1v1Rating,names"
-        private val MOD_ENDPOINT = "/data/mod"
-        private val OAUTH_TOKEN_PATH = "/oauth/token"
+        private const val MAP_ENDPOINT = "/data/map"
+        private const val TOURNAMENT_LIST_ENDPOINT = "/challonge/v1/tournaments.json"
+        private const val REPLAY_INCLUDES = "featuredMod,playerStats,playerStats.player,reviews,reviews.player,mapVersion,mapVersion.map,mapVersion.reviews,reviewsSummary"
+        private const val COOP_RESULT_INCLUDES = "game.playerStats.player"
+        private const val PLAYER_INCLUDES = "globalRating,ladder1v1Rating,names"
+        private const val MOD_ENDPOINT = "/data/mod"
+        private const val OAUTH_TOKEN_PATH = "/oauth/token"
 
         private fun rsql(eq: Condition<*>): String {
             return eq.query(RSQLVisitor())
         }
 
-        private fun <T : QBuilder<T>> qBuilder(): QBuilder<T> {
-            return QBuilder()
-        }
     }
 }

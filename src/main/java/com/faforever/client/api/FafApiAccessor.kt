@@ -54,11 +54,11 @@ interface FafApiAccessor {
     @SuppressWarnings("unchecked")
     fun getPlayerEvents(playerId: Int): List<PlayerEvent>
 
-    fun getAchievementDefinition(achievementId: String): AchievementDefinition
+    fun getAchievementDefinition(achievementId: String): AchievementDefinition?
 
     fun authorize(playerId: Int, username: String, password: String)
 
-    fun getLadder1v1EntryForPlayer(playerId: Int): Ladder1v1LeaderboardEntry
+    fun getLadder1v1EntryForPlayer(playerId: Int): Ladder1v1LeaderboardEntry?
 
     fun getGamePlayerStats(playerId: Int, knownFeaturedMod: KnownFeaturedMod): List<GamePlayerStats>
 
@@ -82,27 +82,27 @@ interface FafApiAccessor {
 
     fun getModVersion(uid: String): ModVersion
 
-    fun getFeaturedModFiles(featuredMod: FeaturedMod, version: Integer): List<FeaturedModFile>
+    fun getFeaturedModFiles(featuredMod: FeaturedMod, version: Int): List<FeaturedModFile>
 
     fun getNewestReplays(count: Int, page: Int): List<Game>
 
     fun getHighestRatedReplays(count: Int, page: Int): List<Game>
 
-    fun findReplaysByQuery(condition: String, maxResults: Int, page: Int, sortConfig: SortConfig): List<Game>
+    fun findReplaysByQuery(query: String, maxResults: Int, page: Int, sortConfig: SortConfig): List<Game>
 
     fun findMapByFolderName(folderName: String): Optional<MapVersion>
 
-    fun getPlayersByIds(playerIds: Collection<Integer>): List<com.faforever.client.api.dto.Player>
+    fun getPlayersByIds(playerIds: Collection<Int>): List<com.faforever.client.api.dto.Player>
 
-    fun createGameReview(review: GameReview): GameReview
+    fun createGameReview(review: GameReview): GameReview?
 
     fun updateGameReview(review: GameReview)
 
-    fun createModVersionReview(review: ModVersionReview): ModVersionReview
+    fun createModVersionReview(review: ModVersionReview): ModVersionReview?
 
     fun updateModVersionReview(review: ModVersionReview)
 
-    fun createMapVersionReview(review: MapVersionReview): MapVersionReview
+    fun createMapVersionReview(review: MapVersionReview): MapVersionReview?
 
     fun updateMapVersionReview(review: MapVersionReview)
 
